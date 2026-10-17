@@ -1,0 +1,4 @@
+split,rows,players,first_t,last_t,last_target,rows_core_leagues,rows_new_leagues,train_target_before_val
+train,285272,32822,2014-07-01,2023-06-30,2024-06-30,112775,0,249357
+val,36376,16664,2023-07-01,2024-06-30,2025-08-26,11711,0,0
+test,35976,17534,2024-07-01,2025-07-28,2026-06-12,12167,8671,0

@@ -1,0 +1,10 @@
+test set,model,n,MAE_change,RMSE_change,R2_change,Spearman_change,top10_rise_prec_%,top10_fall_prec_%,MAE_eur,RMSE_eur,MAPE_%,MdAPE_%,within_20%,skill_vs_naive_%
+core test,Naive (no change),12167,0.48,0.6938,-0.0004,,,,2886942.0,6564014.0,48.6,37.5,32.2,0.0
+core test,CatBoost trained WITHOUT unknown-club rows,12167,0.3948,0.5655,0.3356,0.5838,72.14,95.65,2441098.0,5983897.0,39.47,28.05,37.6,17.8
+core test,CatBoost trained WITH unknown-club rows,12167,0.3948,0.5666,0.3328,0.5864,71.49,95.56,2433930.0,5946973.0,39.4,28.09,37.92,17.8
+core + unknown-club test,Naive (no change),12226,0.4818,0.6974,-0.0006,,,,2874787.0,6548706.0,48.63,37.5,32.17,0.0
+core + unknown-club test,CatBoost trained WITHOUT unknown-club rows,12226,0.3966,0.5694,0.333,0.5839,72.2,95.67,2431068.0,5970038.0,39.55,28.14,37.55,17.7
+core + unknown-club test,CatBoost trained WITH unknown-club rows,12226,0.3964,0.5701,0.3314,0.5868,71.63,95.5,2423911.0,5933199.0,39.47,28.1,37.91,17.7
+unknown-club test only,Naive (no change),59,0.8575,1.2295,-0.4105,,,,368051.0,1220292.0,53.73,50.0,25.42,0.0
+unknown-club test only,CatBoost trained WITHOUT unknown-club rows,59,0.7668,1.1165,-0.1632,0.2911,83.33,16.67,362569.0,1215342.0,55.53,47.58,27.12,10.6
+unknown-club test only,CatBoost trained WITH unknown-club rows,59,0.7266,1.0659,-0.0601,0.4919,100.0,0.0,357815.0,1207000.0,53.34,41.47,35.59,15.3

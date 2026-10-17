@@ -1,0 +1,51 @@
+feature,group,description,type,missing_%
+age,player,Age in years at t (from date of birth),numeric,0.0
+height_cm,player,Height in cm (time-invariant),numeric,1.2
+position,player,Main position: Goalkeeper / Defender / Midfield / Attack,categorical,0.0
+sub_position,player,"Detailed position, e.g. Centre-Back, Left Winger",categorical,0.1
+foot,player,Preferred foot,categorical,2.8
+is_foreign,player,1 if citizenship differs from the country of the league at t,numeric,59.7
+log_value,value history,log market value at t,numeric,0.0
+log_value_6m_ago,value history,log value of the last valuation dated 120-270 days before t,numeric,17.9
+log_value_12m_ago,value history,log value of the last valuation dated 300-450 days before t,numeric,21.4
+growth_6m,value history,log_value - log_value_6m_ago,numeric,17.9
+growth_12m,value history,log_value - log_value_12m_ago,numeric,21.4
+log_max_value_so_far,value history,Highest log value up to t,numeric,0.0
+value_vs_max,value history,log_value - log_max_value_so_far (0 = at career peak),numeric,0.0
+n_valuations_so_far,value history,Number of valuations up to t,numeric,0.0
+days_since_prev_valuation,value history,Days since the previous valuation,numeric,4.0
+change_since_prev_valuation,value history,log change since the previous valuation,numeric,4.0
+years_since_first_valuation,value history,Years since the first valuation,numeric,0.0
+matches_365,performance,Matches played in the last 365 days (all competitions),numeric,0.0
+minutes_365,performance,Minutes played in the last 365 days,numeric,0.0
+goals_365,performance,Goals in the last 365 days,numeric,0.0
+assists_365,performance,Assists in the last 365 days,numeric,0.0
+ga_per90_365,performance,"(Goals + assists) per 90 minutes, last 365 days",numeric,0.0
+yellow_365,performance,Yellow cards in the last 365 days,numeric,0.0
+red_365,performance,Red cards in the last 365 days,numeric,0.0
+league_matches_365,performance,Domestic-league matches in the last 365 days,numeric,0.0
+league_minutes_365,performance,Domestic-league minutes in the last 365 days,numeric,0.0
+league_ga_per90_365,performance,"Domestic-league (goals + assists) per 90, last 365 days",numeric,0.0
+other_comp_minutes_365,performance,"Minutes in cups / European competitions, last 365 days",numeric,0.0
+minutes_prev_365,performance,Minutes played 365-730 days before t,numeric,0.0
+minutes_change,performance,minutes_365 - minutes_prev_365,numeric,0.0
+ga_per90_prev_365,performance,"(Goals + assists) per 90, 365-730 days before t",numeric,0.0
+days_since_last_appearance,performance,Days since the last recorded match,numeric,42.0
+n_transfers_so_far,transfers,Number of the player's transfers up to t,numeric,0.0
+days_since_last_transfer,transfers,Days since the player's last transfer,numeric,36.3
+log_last_transfer_fee,transfers,log(1 + fee) of the player's last transfer,numeric,36.3
+log_max_transfer_fee,transfers,log(1 + highest fee) ever paid for the player up to t,numeric,36.3
+club_known,club/league,"1 if the club at t is known (from a transfer or match on/before t), else 0",numeric,0.0
+league_t,club/league,League at t (from the club's league games); OTHER / UNKNOWN otherwise,categorical,0.0
+club_log_spend_3y,club/league,log(1 + fees paid by the club) in the last 3 years,numeric,21.3
+club_log_income_3y,club/league,log(1 + fees received by the club) in the last 3 years,numeric,21.3
+club_net_spend_3y_m,club/league,Club net transfer spend in the last 3 years (EUR million),numeric,21.3
+club_games_365,club/league,Club matches in the data in the last 365 days,numeric,21.3
+club_win_rate_365,club/league,Club win rate in the last 365 days,numeric,46.9
+club_gd_per_game_365,club/league,"Club goal difference per game, last 365 days",numeric,46.9
+club_mean_log_value,club/league,Mean log value of the club's players (latest month-end snapshot),numeric,23.3
+club_log_total_value,club/league,log total squad value (latest month-end snapshot),numeric,23.3
+club_n_valued_players,club/league,Number of valued players at the club (snapshot),numeric,23.3
+value_vs_club_mean,club/league,log_value - club_mean_log_value,numeric,23.3
+league_median_log_value,club/league,Median log value in the player's league (snapshot),numeric,0.2
+value_vs_league_median,club/league,log_value - league_median_log_value,numeric,0.2

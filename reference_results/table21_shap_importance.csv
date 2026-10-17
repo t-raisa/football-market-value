@@ -1,0 +1,51 @@
+feature,group,mean_abs_SHAP,direction,description,rank
+age,player,0.1039,higher value → lower forecast (ρ=-0.98),Age in years at t (from date of birth),1
+change_since_prev_valuation,value history,0.0524,higher value → higher forecast (ρ=0.92),log change since the previous valuation,2
+value_vs_league_median,club/league,0.0399,higher value → lower forecast (ρ=-0.95),log_value - league_median_log_value,3
+n_valuations_so_far,value history,0.0348,higher value → lower forecast (ρ=-0.98),Number of valuations up to t,4
+days_since_last_appearance,performance,0.0335,higher value → lower forecast (ρ=-0.89),Days since the last recorded match,5
+value_vs_club_mean,club/league,0.0311,higher value → lower forecast (ρ=-0.95),log_value - club_mean_log_value,6
+log_value,value history,0.0304,higher value → lower forecast (ρ=-0.94),log market value at t,7
+growth_6m,value history,0.0287,higher value → higher forecast (ρ=0.92),log_value - log_value_6m_ago,8
+league_t,club/league,0.0286,categorical (see per-category table),League at t (from the club's league games); OTHER / UNKNOWN otherwise,9
+club_gd_per_game_365,club/league,0.0282,higher value → higher forecast (ρ=0.95),"Club goal difference per game, last 365 days",10
+years_since_first_valuation,value history,0.0273,higher value → lower forecast (ρ=-0.98),Years since the first valuation,11
+log_max_transfer_fee,transfers,0.025,higher value → lower forecast (ρ=-0.74),log(1 + highest fee) ever paid for the player up to t,12
+league_median_log_value,club/league,0.025,higher value → lower forecast (ρ=-0.79),Median log value in the player's league (snapshot),13
+days_since_last_transfer,transfers,0.0226,higher value → lower forecast (ρ=-0.13),Days since the player's last transfer,14
+value_vs_max,value history,0.018,higher value → higher forecast (ρ=0.39),log_value - log_max_value_so_far (0 = at career peak),15
+log_last_transfer_fee,transfers,0.014,higher value → higher forecast (ρ=0.40),log(1 + fee) of the player's last transfer,16
+minutes_365,performance,0.0132,higher value → higher forecast (ρ=0.97),Minutes played in the last 365 days,17
+log_value_6m_ago,value history,0.0126,higher value → lower forecast (ρ=-0.96),log value of the last valuation dated 120-270 days before t,18
+n_transfers_so_far,transfers,0.0115,higher value → higher forecast (ρ=0.56),Number of the player's transfers up to t,19
+club_games_365,club/league,0.0108,higher value → lower forecast (ρ=-0.91),Club matches in the data in the last 365 days,20
+sub_position,player,0.0101,categorical (see per-category table),"Detailed position, e.g. Centre-Back, Left Winger",21
+league_minutes_365,performance,0.0101,higher value → higher forecast (ρ=0.96),Domestic-league minutes in the last 365 days,22
+log_max_value_so_far,value history,0.01,higher value → lower forecast (ρ=-0.91),Highest log value up to t,23
+minutes_change,performance,0.0095,higher value → higher forecast (ρ=0.93),minutes_365 - minutes_prev_365,24
+club_win_rate_365,club/league,0.0082,higher value → higher forecast (ρ=0.78),Club win rate in the last 365 days,25
+club_log_total_value,club/league,0.0077,higher value → lower forecast (ρ=-0.91),log total squad value (latest month-end snapshot),26
+days_since_prev_valuation,value history,0.007,higher value → higher forecast (ρ=0.14),Days since the previous valuation,27
+log_value_12m_ago,value history,0.0068,higher value → lower forecast (ρ=-0.86),log value of the last valuation dated 300-450 days before t,28
+height_cm,player,0.0066,higher value → higher forecast (ρ=0.93),Height in cm (time-invariant),29
+growth_12m,value history,0.006,higher value → lower forecast (ρ=-0.45),log_value - log_value_12m_ago,30
+league_ga_per90_365,performance,0.0059,higher value → higher forecast (ρ=0.90),"Domestic-league (goals + assists) per 90, last 365 days",31
+minutes_prev_365,performance,0.005,higher value → lower forecast (ρ=-0.43),Minutes played 365-730 days before t,32
+club_net_spend_3y_m,club/league,0.005,higher value → lower forecast (ρ=-0.70),Club net transfer spend in the last 3 years (EUR million),33
+club_log_income_3y,club/league,0.0042,mixed / non-monotone (ρ=0.01),log(1 + fees received by the club) in the last 3 years,34
+club_mean_log_value,club/league,0.0041,higher value → lower forecast (ρ=-0.78),Mean log value of the club's players (latest month-end snapshot),35
+club_log_spend_3y,club/league,0.0033,higher value → higher forecast (ρ=0.27),log(1 + fees paid by the club) in the last 3 years,36
+assists_365,performance,0.0031,higher value → higher forecast (ρ=0.76),Assists in the last 365 days,37
+ga_per90_365,performance,0.003,higher value → higher forecast (ρ=0.89),"(Goals + assists) per 90 minutes, last 365 days",38
+goals_365,performance,0.0029,higher value → higher forecast (ρ=0.90),Goals in the last 365 days,39
+matches_365,performance,0.0027,higher value → lower forecast (ρ=-0.51),Matches played in the last 365 days (all competitions),40
+position,player,0.0021,categorical (see per-category table),Main position: Goalkeeper / Defender / Midfield / Attack,41
+other_comp_minutes_365,performance,0.0019,higher value → higher forecast (ρ=0.70),"Minutes in cups / European competitions, last 365 days",42
+is_foreign,player,0.0019,higher value → higher forecast (ρ=0.57),1 if citizenship differs from the country of the league at t,43
+club_n_valued_players,club/league,0.0017,higher value → lower forecast (ρ=-0.65),Number of valued players at the club (snapshot),44
+league_matches_365,performance,0.0016,higher value → lower forecast (ρ=-0.29),Domestic-league matches in the last 365 days,45
+ga_per90_prev_365,performance,0.0016,higher value → higher forecast (ρ=0.15),"(Goals + assists) per 90, 365-730 days before t",46
+yellow_365,performance,0.001,higher value → higher forecast (ρ=0.52),Yellow cards in the last 365 days,47
+foot,player,0.0006,categorical (see per-category table),Preferred foot,48
+red_365,performance,0.0004,higher value → higher forecast (ρ=0.41),Red cards in the last 365 days,49
+club_known,club/league,0.0,constant in this sample (no effect),"1 if the club at t is known (from a transfer or match on/before t), else 0",50

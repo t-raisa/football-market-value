@@ -1,0 +1,9 @@
+,n,R2_value_level,R2_change (main text)
+Naive (no change),12167,0.828,-0.0004
+Ridge regression,12167,0.8838,0.324
+Random Forest,12167,0.8897,0.3587
+LightGBM,12167,0.8854,0.3337
+XGBoost,12167,0.8875,0.3458
+CatBoost,12167,0.8858,0.3356
+GRU (mean of 3 seeds),12167,0.8856,0.3349
+LightGBM + GRU average,12167,0.8869,0.3423

@@ -1,0 +1,21 @@
+A,B,MAE(A) − MAE(B),95% CI low,95% CI high,verdict
+LightGBM,CatBoost,-0.0008,-0.0018,0.0002,no clear difference
+LightGBM,XGBoost,-0.001,-0.0022,0.0002,no clear difference
+LightGBM,GRU,-0.0033,-0.0053,-0.0013,LightGBM better
+LightGBM,LightGBM + GRU,0.0009,-0.0001,0.002,no clear difference
+CatBoost,XGBoost,-0.0002,-0.0015,0.0012,no clear difference
+CatBoost,GRU,-0.0025,-0.0044,-0.0004,CatBoost better
+CatBoost,LightGBM + GRU,0.0018,0.0005,0.0031,LightGBM + GRU better
+XGBoost,GRU,-0.0023,-0.0044,-0.0001,XGBoost better
+XGBoost,LightGBM + GRU,0.0019,0.0005,0.0034,LightGBM + GRU better
+GRU,LightGBM + GRU,0.0042,0.0032,0.0052,LightGBM + GRU better
+LightGBM,Random Forest,-0.0061,-0.0087,-0.0035,LightGBM better
+LightGBM,Ridge,-0.0135,-0.0161,-0.0107,LightGBM better
+Random Forest,Ridge,-0.0074,-0.01,-0.0047,Random Forest better
+Ridge,Naive,-0.0725,-0.0792,-0.0659,Ridge better
+Random Forest,Naive,-0.0799,-0.0877,-0.0723,Random Forest better
+XGBoost,Naive,-0.085,-0.0916,-0.0783,XGBoost better
+CatBoost,Naive,-0.0852,-0.0915,-0.0786,CatBoost better
+LightGBM,Naive,-0.086,-0.0921,-0.0797,LightGBM better
+GRU,Naive,-0.0827,-0.0893,-0.0762,GRU better
+LightGBM + GRU,Naive,-0.0869,-0.0932,-0.0806,LightGBM + GRU better

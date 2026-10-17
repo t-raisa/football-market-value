@@ -1,0 +1,5 @@
+variant,features,trees,MAE_change,ΔMAE vs full,Δ 95% CI low,Δ 95% CI high,verdict,Spearman_change,within_20%
+full model (50 features),50,596,0.394,0.0,0.0,0.0,—,0.5849,37.799
+without club finance (3 features),47,540,0.3946,0.0006,-0.0001,0.0012,no clear difference,0.5828,38.0455
+without club spending only,49,542,0.3943,0.0003,-0.0004,0.0009,no clear difference,0.5833,38.2263
+without club/league,36,552,0.3979,0.0039,0.0021,0.0056,worse than full,0.5791,37.7003

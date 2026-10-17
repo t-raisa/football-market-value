@@ -1,0 +1,41 @@
+{
+  "Ridge regression": {
+    "alpha": 1000,
+    "n_trees": null
+  },
+  "Random Forest": {
+    "max_features": 0.5,
+    "min_samples_leaf": 10,
+    "n_trees": null
+  },
+  "LightGBM": {
+    "colsample_bytree": 0.5,
+    "min_child_samples": 100,
+    "num_leaves": 31,
+    "objective": "l1",
+    "reg_lambda": 0,
+    "subsample": 0.7,
+    "n_trees": 596
+  },
+  "XGBoost": {
+    "colsample_bytree": 0.7,
+    "max_depth": 6,
+    "min_child_weight": 1,
+    "objective": "reg:absoluteerror",
+    "reg_lambda": 1,
+    "subsample": 0.9,
+    "n_trees": 532
+  },
+  "CatBoost": {
+    "depth": 6,
+    "l2_leaf_reg": 3,
+    "loss_function": "MAE",
+    "n_trees": 764
+  },
+  "GRU": {
+    "epochs": 9,
+    "seq_len": 10,
+    "hidden": 32,
+    "seeds": 3
+  }
+}

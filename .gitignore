@@ -1,0 +1,14 @@
+# Raw data: download from Kaggle (see README); large and not ours to redistribute
+data/raw/*
+!data/raw/.gitkeep
+
+# Re-created by the notebooks
+data/processed/*
+!data/processed/.gitkeep
+models/
+
+# Python / Jupyter / macOS clutter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store

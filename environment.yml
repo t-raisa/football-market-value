@@ -1,0 +1,24 @@
+# Conda environment for the study (pinned versions used for every reported number).
+# Create with:  conda env create -f environment.yml
+# Exact full lock file for Apple Silicon (osx-arm64): environment.lock.yml
+name: football
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11.17
+  - numpy=1.26.4
+  - pandas=3.0.6
+  - pyarrow=25.0.0
+  - scipy=1.17.1
+  - scikit-learn=1.9.1
+  - xgboost=3.4.2
+  - lightgbm=4.7.0
+  - catboost=1.2.7
+  - shap=0.48.0
+  - pytorch=2.14.1
+  - matplotlib=3.11.2
+  - seaborn=0.13.2
+  - jupyterlab=4.6.4
+  - ipykernel=7.4.0
+  - nbconvert=7.17.2
+  - nbformat=5.11.1

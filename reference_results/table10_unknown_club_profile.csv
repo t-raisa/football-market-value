@@ -1,0 +1,24 @@
+,known club: 14 core leagues,known club: other leagues,unknown club
+rows,136653.0,144841.0,76130.0
+players,20288.0,21260.0,14392.0
+share of all rows (%),38.21,40.5,21.29
+median value at t (€m),1.5,0.4,0.25
+value cheap (<€1m) (%),40.1,76.01,89.06
+value medium (€1–10m) (%),44.9,23.12,10.83
+value expensive (≥€10m) (%),15.01,0.87,0.1
+median age,25.72,23.68,25.5
+age <21 (%),13.43,24.2,16.71
+age 21–25 (%),38.97,44.71,36.78
+age 26–29 (%),28.31,20.57,25.03
+age 30+ (%),19.28,10.51,21.48
+position Goalkeeper (%),9.76,12.07,11.09
+position Defender (%),33.87,33.21,30.95
+position Midfield (%),29.28,28.47,29.07
+position Attack (%),27.03,26.23,28.69
+no minutes in last 365 days (%),3.73,90.77,100.0
+has a transfer before t (%),63.65,97.12,0.0
+median 12-month log change,-0.05,0.11,0.0
+12-month value fell (%),50.16,31.64,43.47
+rows in train,112775.0,96528.0,75969.0
+rows in val,11711.0,24563.0,102.0
+rows in test,12167.0,23750.0,59.0

@@ -1,0 +1,6 @@
+scheme,test rows,n,players,MAE_change,skill_vs_naive_%,skill 95% CI
+Time split,all test rows,12167,6292,0.3981,17.1,"[15.7, 18.5]"
+Random 80/20 (rows),all test rows,27266,12636,0.3594,19.7,"[18.9, 20.5]"
+Random 80/20 (rows),t ≥ 2024-07,2472,2197,0.3722,23.8,"[21.3, 26.1]"
+Random 80/20 (by player),all test rows,27268,4058,0.3733,17.5,"[16.4, 18.5]"
+Random 80/20 (by player),t ≥ 2024-07,2512,1287,0.403,19.7,"[16.7, 22.6]"

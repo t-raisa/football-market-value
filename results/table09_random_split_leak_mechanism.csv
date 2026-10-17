@@ -1,0 +1,4 @@
+,test rows,player has a LATER row in train (%),target valuation is a train row's input (%),test rows dated after train start (%)
+Time split,12167.0,0.0,0.0,100.0
+Random 80/20 (rows),27266.0,82.0,46.9,99.7
+Random 80/20 (by player),27268.0,0.0,0.0,99.7

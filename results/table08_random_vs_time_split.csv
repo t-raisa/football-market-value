@@ -1,0 +1,11 @@
+scheme,test rows,model,n,MAE_change,RMSE_change,R2_change,Spearman_change,top10_rise_prec_%,top10_fall_prec_%,MAE_eur,RMSE_eur,MAPE_%,MdAPE_%,within_20%,skill_vs_naive_%
+Time split,all test rows,Naive (no change),12167,0.48,0.6938,-0.0004,,,,2886942.0,6564014.0,48.6,37.5,32.2,0.0
+Time split,all test rows,LightGBM (untuned),12167,0.3981,0.5532,0.3641,0.5788,71.08,95.23,2469637.0,6076444.0,43.52,29.04,36.37,17.1
+Random 80/20 (rows),all test rows,Naive (no change),27266,0.4476,0.6359,-0.0004,,,,2037539.0,5155319.0,47.86,33.33,34.99,0.0
+Random 80/20 (rows),all test rows,LightGBM (untuned),27266,0.3594,0.4921,0.401,0.6108,76.42,91.82,1655124.0,4218612.0,38.61,26.41,39.62,19.7
+Random 80/20 (rows),test rows with t ≥ 2024-07,Naive (no change),2472,0.4885,0.7074,-0.0009,,,,2880714.0,6502839.0,49.26,37.5,31.67,0.0
+Random 80/20 (rows),test rows with t ≥ 2024-07,LightGBM (untuned),2472,0.3722,0.5232,0.4526,0.6664,78.23,96.37,2233785.0,5238440.0,39.52,26.89,38.92,23.8
+Random 80/20 (by player),all test rows,Naive (no change),27268,0.4524,0.6444,-0.0,,,,2105490.0,5640538.0,47.6,33.33,34.57,0.0
+Random 80/20 (by player),all test rows,LightGBM (untuned),27268,0.3733,0.512,0.3689,0.5815,75.5,91.13,1777835.0,4908695.0,39.79,27.31,38.49,17.5
+Random 80/20 (by player),test rows with t ≥ 2024-07,Naive (no change),2512,0.5021,0.7314,-0.0048,,,,3165994.0,7309457.0,48.54,40.0,30.61,0.0
+Random 80/20 (by player),test rows with t ≥ 2024-07,LightGBM (untuned),2512,0.403,0.5705,0.3887,0.6143,80.56,96.03,2639071.0,6556573.0,42.8,29.09,36.66,19.7

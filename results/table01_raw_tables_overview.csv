@@ -1,0 +1,12 @@
+table,rows,cols_kept,cols_in_csv,csv_MB,parquet_MB,RAM_MB
+players,50149,12,26,19.6,1.2,3.1
+player_valuations,656301,5,6,39.6,3.4,13.8
+appearances,1894350,10,13,198.4,7.8,51.1
+transfers,175165,7,10,18.1,1.3,5.1
+clubs,796,5,17,0.2,0.0,0.0
+competitions,65,8,11,0.0,0.0,0.0
+games,88958,11,23,29.0,1.0,3.0
+club_games,177916,8,11,14.7,1.4,3.6
+countries,124,4,8,0.0,0.0,0.0
+national_teams,124,4,17,0.0,0.0,0.0
+TOTAL,3043948,74,142,319.6,16.1,79.7

@@ -1,0 +1,7 @@
+A,B,"skill(A) − skill(B), points",95% CI,verdict
+Random 80/20 (rows) [all test rows],Time split [all test rows],2.6,"[1.0, 4.3]",A higher
+Random 80/20 (by player) [all test rows],Time split [all test rows],0.4,"[-1.2, 2.0]",no clear difference
+Random 80/20 (rows) [all test rows],Random 80/20 (by player) [all test rows],2.2,"[1.0, 3.4]",A higher
+Random 80/20 (rows) [t ≥ 2024-07],Time split [all test rows],6.7,"[3.8, 9.5]",A higher
+Random 80/20 (by player) [t ≥ 2024-07],Time split [all test rows],2.6,"[-0.6, 5.8]",no clear difference
+Random 80/20 (rows) [t ≥ 2024-07],Random 80/20 (by player) [t ≥ 2024-07],4.1,"[0.4, 7.8]",A higher
