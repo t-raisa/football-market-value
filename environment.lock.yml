@@ -299,6 +299,7 @@ dependencies:
   - stack_data=0.6.3
   - statsmodels=0.15.0
   - sympy=1.14.0
+  - tectonic=0.17.0
   - terminado=0.18.1
   - threadpoolctl=3.7.0
   - tinycss2=1.4.0

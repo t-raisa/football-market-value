@@ -1,0 +1,15 @@
+# SHA-256 of the dataset version used in the paper (zip, then each CSV inside it).
+# Files marked 'used' are read by the notebooks; the others are in the zip but not used.
+5971ec002b9d7b3e99358ed28b0518e7f384549db53075efc273cc57f7dacdf1  transfermarkt_davidcariboo.zip  # zip
+c4ba5327f9005e4a9914c0f78c3b07132ef2cf1a4babda379bbf54ffd207ebec  appearances.csv  # used
+d840a80e58b47423bdcdd6c6770c15fb477b31bfee356a52eb4b1a9c5c64195e  club_games.csv  # used
+26dc6113d8206246145add2c7a318a657b3995fccdb0c9004d65ca6ae5e5968b  clubs.csv  # used
+fadaf2992e01f8450d8d419006b0f533bbd6742163f4a0c5ee6a157fae7b791e  competitions.csv  # used
+d694bb609efa95b90283f72fbf8f849713be6df4d3f79b34604121231424a5fe  countries.csv  # used
+93a4938b5ef31d4234590d3897b9c7baddfa13a1a392e00a86645b2a2221c535  game_events.csv  # not used
+06af8b0fcffc675eb2dc6363f185caad0ffb6835d018004dcc9a0eb1c5a50145  game_lineups.csv  # not used
+c24da068cc7444e1e345c274d8d2320226cafc02186a17de2cf766eccb8ae79b  games.csv  # used
+e0fa44d795491eba6277812d58a4b0cebd3db98446dd10442eb984b8c0a0c0ed  national_teams.csv  # used
+9caf4ff707905f71463a04253c5ac640b3ff9575e07912fd7c50365697efa47d  player_valuations.csv  # used
+b94216cf2ff8777b5eddd4fd91402c19e757b366fbdeb4f4437580c302ff2d66  players.csv  # used
+5331311c6ec68c2c7a9c22979aff7d6f6fd2cefd96201d1bcfb35998a9d244ae  transfers.csv  # used

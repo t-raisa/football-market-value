@@ -1,0 +1,7 @@
+,rows,median gap (days),median log change,rose %,unchanged %,fell %,fell >33% (%)
+"kept (12-month target), all",342442,364.0,0.0,42.16,16.91,40.93,19.88
+"genuine drops with a later valuation ≤18m, all",103753,298.0,0.0,34.22,22.6,43.19,20.83
+  … later valuation before 10 months,59203,250.0,0.0,27.83,27.8,44.36,19.63
+  … later valuation after 14 months,44550,444.0,0.0,42.7,15.68,41.62,22.43
+"kept, test period, core",7409,364.0,-0.06,37.08,12.57,50.36,26.89
+"genuine drops ≤18m, test period, core",2497,432.0,0.0,33.48,16.9,49.62,26.39

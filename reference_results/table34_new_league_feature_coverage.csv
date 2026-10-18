@@ -1,0 +1,3 @@
+,rows,365-day window covered by match data (mean %),window fully covered (%),minutes_365 = 0 (%),minutes_prev_365 = 0 (%),no appearance on record (%),median minutes_365
+core leagues (test),12167,100.0,100.0,4.7,27.9,2.9,1338.0
+17 new leagues (test),8671,46.5,0.0,87.3,91.8,72.0,0.0

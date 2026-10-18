@@ -1,0 +1,12 @@
+model,MAE(model) − MAE(best simple),95% CI low,95% CI high,verdict,skill vs best simple %,skill 95% CI
+Naive,0.0574,0.0517,0.0632,Age-value curve better,-13.6,"[-15.0, -12.2]"
+Age-value-league curve,0.001,-0.001,0.0029,no clear difference,-0.2,"[-0.7, 0.2]"
+Momentum,0.2173,0.2034,0.2309,Age-value curve better,-51.4,"[-55.0, -47.9]"
+Momentum (damped),0.0582,0.0505,0.0654,Age-value curve better,-13.8,"[-15.6, -11.8]"
+Ridge,-0.0152,-0.0186,-0.0117,Ridge better,3.6,"[2.8, 4.3]"
+Random Forest,-0.0225,-0.0264,-0.0184,Random Forest better,5.3,"[4.4, 6.2]"
+XGBoost,-0.0276,-0.0315,-0.0237,XGBoost better,6.5,"[5.7, 7.4]"
+CatBoost,-0.0278,-0.0316,-0.0242,CatBoost better,6.6,"[5.7, 7.4]"
+LightGBM,-0.0286,-0.0322,-0.025,LightGBM better,6.8,"[6.0, 7.6]"
+GRU,-0.0253,-0.0296,-0.0216,GRU better,6.0,"[5.1, 7.0]"
+LightGBM + GRU,-0.0296,-0.0335,-0.026,LightGBM + GRU better,7.0,"[6.2, 7.9]"

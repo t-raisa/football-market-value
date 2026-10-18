@@ -1,0 +1,16 @@
+,core leagues (test),17 new leagues (test)
+matches_365,4.7,87.3
+minutes_365,4.7,87.3
+goals_365,45.6,95.9
+assists_365,44.7,96.2
+ga_per90_365,32.3,94.2
+yellow_365,23.4,93.4
+red_365,93.2,99.7
+league_matches_365,6.2,96.7
+league_minutes_365,6.2,96.7
+league_ga_per90_365,35.7,98.3
+other_comp_minutes_365,30.6,88.6
+minutes_prev_365,27.9,91.8
+minutes_change,3.7,82.9
+ga_per90_prev_365,47.4,94.9
+days_since_last_appearance,5.8,72.1

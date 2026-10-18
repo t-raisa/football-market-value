@@ -1,0 +1,4 @@
+model,features,trees,MAE,skill vs no change %,skill vs curve %,skill vs curve 95% CI
+"LightGBM, all 50 features",50.0,596.0,0.394,17.9166,6.7725,"[6.0, 7.6]"
+LightGBM without position/sub-position/height/foot,46.0,624.0,0.3951,17.6911,6.5164,"[5.7, 7.4]"
+difference (without − with),,,0.0011,,,"MAE diff CI [0.0000, 0.0021]"

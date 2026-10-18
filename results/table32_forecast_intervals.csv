@@ -1,0 +1,4 @@
+,coverage of 80% interval %,coverage 95% CI,below q10 %,above q90 %,mean width (log),median width (log),median width (EUR m),mean width (EUR m),median width / value at t (%),pinball q10,pinball q50,pinball q90,mean pinball
+LightGBM quantile,77.57,"[76.8, 78.5]",11.474,10.956,1.159,1.056,2.671,6.681,105.655,0.083,0.197,0.1,0.127
+age × value percentiles,81.31,"[80.4, 82.2]",8.885,9.805,1.275,1.168,3.0,9.061,125.714,0.086,0.212,0.113,0.137
+constant percentiles (all training rows),81.499,"[80.6, 82.4]",7.085,11.416,1.386,1.386,3.0,10.835,150.0,0.093,0.239,0.151,0.161

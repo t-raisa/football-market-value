@@ -39,12 +39,13 @@ def change(d):
     return (d["y"] - d["log_value"]).astype("float64")
 
 
-def fit_lgb(params, feats, tune, val, final, max_trees=5000):
+def fit_lgb(params, feats, tune, val, final, max_trees=5000, eval_metric="l1"):
     """Early stopping on validation (fit on the tuning rows) picks the number of trees;
-    then refit on `final` with that many trees. Returns (model, n_trees)."""
+    then refit on `final` with that many trees. Returns (model, n_trees).
+    eval_metric: the validation loss used for early stopping (e.g. "quantile" for quantile models)."""
     base = dict(random_state=SEED, deterministic=True, force_row_wise=True, verbose=-1)
     es = lgb.LGBMRegressor(n_estimators=max_trees, **base, **params)
-    es.fit(tune[feats], change(tune), eval_set=[(val[feats], change(val))], eval_metric="l1",
+    es.fit(tune[feats], change(tune), eval_set=[(val[feats], change(val))], eval_metric=eval_metric,
            callbacks=[lgb.early_stopping(200, first_metric_only=True, verbose=False)])
     n = int(es.best_iteration_)
     model = lgb.LGBMRegressor(n_estimators=n, **base, **params).fit(final[feats], change(final))

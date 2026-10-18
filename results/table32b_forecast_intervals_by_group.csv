@@ -1,0 +1,15 @@
+grouping,group,interval,rows,coverage %,coverage 95% CI,below q10 %,above q90 %,median width (log),median width / value at t (%),mean pinball
+age group,<21,LightGBM quantile,1686,74.792,"[72.3, 77.1]",9.549,15.658,1.682,317.774,0.205
+age group,<21,age × value percentiles,1686,75.386,"[72.9, 77.9]",9.727,14.887,2.015,466.666,0.231
+age group,21–25,LightGBM quantile,5038,76.141,"[74.7, 77.5]",10.48,13.378,1.191,138.334,0.134
+age group,21–25,age × value percentiles,5038,79.059,"[77.8, 80.3]",8.416,12.525,1.322,150.0,0.145
+age group,26–29,LightGBM quantile,3174,78.607,"[77.0, 80.2]",12.35,9.042,0.957,82.791,0.102
+age group,26–29,age × value percentiles,3174,82.388,"[80.8, 83.9]",9.735,7.876,1.07,98.684,0.109
+age group,30+,LightGBM quantile,2269,81.357,"[79.4, 83.2]",13.883,4.76,0.841,56.165,0.088
+age group,30+,age × value percentiles,2269,89.202,"[87.6, 90.7]",8.109,2.688,0.981,62.5,0.09
+value level,cheap (<€1m),LightGBM quantile,4127,76.811,"[75.3, 78.2]",12.963,10.225,1.153,140.24,0.146
+value level,cheap (<€1m),age × value percentiles,4127,81.1,"[79.7, 82.4]",7.705,11.195,1.179,146.667,0.157
+value level,medium (€1–10m),LightGBM quantile,5549,78.194,"[77.0, 79.5]",10.633,11.173,1.131,112.361,0.126
+value level,medium (€1–10m),age × value percentiles,5549,80.267,"[79.0, 81.5]",9.047,10.687,1.179,138.462,0.137
+value level,expensive (≥€10m),LightGBM quantile,2491,77.439,"[75.4, 79.3]",10.879,11.682,0.866,77.852,0.096
+value level,expensive (≥€10m),age × value percentiles,2491,83.982,"[82.2, 85.7]",10.478,5.54,1.07,109.524,0.104

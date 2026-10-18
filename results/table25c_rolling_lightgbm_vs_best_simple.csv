@@ -1,0 +1,7 @@
+test year,MAE(LightGBM) − MAE(best simple),95% CI low,95% CI high,verdict,skill vs best simple %,skill 95% CI
+2019/20,-0.0145,-0.0179,-0.0107,LightGBM better,3.6,"[2.6, 4.4]"
+2020/21,-0.0307,-0.0342,-0.0274,LightGBM better,7.3,"[6.5, 8.0]"
+2021/22,-0.0352,-0.0399,-0.0305,LightGBM better,8.6,"[7.5, 9.7]"
+2022/23,-0.021,-0.0258,-0.0164,LightGBM better,5.0,"[4.0, 6.0]"
+2023/24,-0.0171,-0.022,-0.0124,LightGBM better,4.2,"[3.0, 5.3]"
+2024/25,-0.0245,-0.0292,-0.0201,LightGBM better,5.8,"[4.8, 6.8]"

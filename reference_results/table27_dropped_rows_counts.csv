@@ -1,0 +1,9 @@
+,period,kept,kept (window partly after data end),dropped: no valuation in window,dropped: window after data end,total,genuine drop rate (% of complete-window rows)
+all leagues,train,285378,0,111675,0,397053,28.1
+all leagues,val,36376,0,15246,0,51622,29.5
+all leagues,test,20688,15288,4907,46600,87483,19.2
+all leagues,all periods,342442,15288,131828,46600,536158,27.8
+14 core leagues,train,112782,0,31176,0,143958,21.7
+14 core leagues,val,11711,0,6417,0,18128,35.4
+14 core leagues,test,7409,4758,2530,17953,32650,25.5
+14 core leagues,all periods,131902,4758,40123,17953,194736,23.3

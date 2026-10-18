@@ -1,0 +1,7 @@
+selection,outcome,precision %,95% CI,minus rule (points),diff 95% CI,verdict
+LightGBM: top 10% predicted rises,really rose %,73.0,"[70.3, 75.7]",7.2,"[4.2, 10.3]",better than rule
+Age-value curve: top 10% predicted rises,really rose %,63.6,"[60.3, 66.8]",-2.2,"[-4.5, 0.1]",no clear difference
+Rule: youngest 10%,really rose %,65.8,"[62.5, 69.0]",,,
+LightGBM: top 10% predicted falls,really fell %,95.6,"[94.2, 96.7]",6.7,"[4.4, 9.0]",better than rule
+Age-value curve: top 10% predicted falls,really fell %,92.6,"[90.7, 94.3]",3.8,"[1.5, 6.1]",better than rule
+Rule: oldest 10%,really fell %,88.8,"[86.6, 91.1]",,,

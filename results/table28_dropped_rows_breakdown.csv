@@ -1,0 +1,26 @@
+,grouping,group,rows,genuine drops,drop rate %
+"test period, core leagues",age group,<21,1590.0,480.0,30.2
+"test period, core leagues",age group,21–25,4071.0,966.0,23.7
+"test period, core leagues",age group,26–29,2532.0,633.0,25.0
+"test period, core leagues",age group,30+,1745.0,450.0,25.8
+"test period, core leagues",value level,cheap (<€1m),3717.0,1046.0,28.1
+"test period, core leagues",value level,medium (€1–10m),4313.0,1029.0,23.9
+"test period, core leagues",value level,expensive (≥€10m),1909.0,455.0,23.8
+"test period, core leagues",league_group,core,9939.0,2530.0,25.5
+"test period, core leagues",any later valuation,no (retired / no longer tracked),32.0,32.0,100.0
+"test period, core leagues",any later valuation,yes,9907.0,2498.0,25.2
+"test period, core leagues",all,all,9939.0,2530.0,25.5
+"all periods, all leagues",age group,<21,88744.0,24648.0,27.8
+"all periods, all leagues",age group,21–25,186264.0,46337.0,24.9
+"all periods, all leagues",age group,26–29,113148.0,29707.0,26.3
+"all periods, all leagues",age group,30+,85834.0,31033.0,36.2
+"all periods, all leagues",value level,cheap (<€1m),326775.0,102959.0,31.5
+"all periods, all leagues",value level,medium (€1–10m),122711.0,24760.0,20.2
+"all periods, all leagues",value level,expensive (≥€10m),24784.0,4109.0,16.6
+"all periods, all leagues",league_group,OTHER,166713.0,35333.0,21.2
+"all periods, all leagues",league_group,UNKNOWN,131856.0,55746.0,42.3
+"all periods, all leagues",league_group,core,172025.0,40123.0,23.3
+"all periods, all leagues",league_group,new_leagues,3676.0,626.0,17.0
+"all periods, all leagues",any later valuation,no (retired / no longer tracked),21103.0,21103.0,100.0
+"all periods, all leagues",any later valuation,yes,453167.0,110725.0,24.4
+"all periods, all leagues",all,all,474270.0,131828.0,27.8

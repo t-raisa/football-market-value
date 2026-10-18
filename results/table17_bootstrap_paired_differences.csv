@@ -12,6 +12,14 @@ GRU,LightGBM + GRU,0.0042,0.0032,0.0052,LightGBM + GRU better
 LightGBM,Random Forest,-0.0061,-0.0087,-0.0035,LightGBM better
 LightGBM,Ridge,-0.0135,-0.0161,-0.0107,LightGBM better
 Random Forest,Ridge,-0.0074,-0.01,-0.0047,Random Forest better
+LightGBM,Age-value curve,-0.0286,-0.0322,-0.025,LightGBM better
+LightGBM,Age-value-league curve,-0.0296,-0.0331,-0.0262,LightGBM better
+LightGBM,Momentum,-0.2459,-0.2595,-0.2325,LightGBM better
+LightGBM,Momentum (damped),-0.0868,-0.0935,-0.0795,LightGBM better
+Age-value curve,Naive,-0.0574,-0.0632,-0.0517,Age-value curve better
+Age-value-league curve,Naive,-0.0564,-0.0623,-0.0502,Age-value-league curve better
+Momentum,Naive,0.1599,0.1458,0.1746,Naive better
+Momentum (damped),Naive,0.0008,-0.0068,0.0084,no clear difference
 Ridge,Naive,-0.0725,-0.0792,-0.0659,Ridge better
 Random Forest,Naive,-0.0799,-0.0877,-0.0723,Random Forest better
 XGBoost,Naive,-0.085,-0.0916,-0.0783,XGBoost better

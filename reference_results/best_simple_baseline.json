@@ -1,0 +1,5 @@
+{
+  "best_simple_baseline": "Age-value curve",
+  "age_curve_statistic": "mean",
+  "chosen_on": "validation year 2023/24 (fitted on tuning rows)"
+}

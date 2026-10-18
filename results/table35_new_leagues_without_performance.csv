@@ -1,0 +1,9 @@
+test set,model,MAE,skill vs no change %,  CI,skill vs curve %,  CI 
+17 new leagues,LightGBM (all 50 features),0.388,13.3219,"[12.2, 14.5]",4.1014,"[3.1, 5.1]"
+17 new leagues,LightGBM without performance,0.3961,11.5139,"[10.2, 12.9]",2.1011,"[0.9, 3.2]"
+17 new leagues,age × value curve,0.4046,9.6149,"[8.3, 11.0]",,
+17 new leagues,difference: without − with performance (MAE),0.0081,,"[0.0052, 0.0109]",,
+14 core leagues,LightGBM (all 50 features),0.394,17.9166,"[16.8, 19.0]",6.7725,"[5.9, 7.6]"
+14 core leagues,LightGBM without performance,0.4004,16.5794,"[15.5, 17.6]",5.2538,"[4.4, 6.0]"
+14 core leagues,age × value curve,0.4226,11.9537,"[10.9, 13.0]",,
+14 core leagues,difference: without − with performance (MAE),0.0064,,"[0.0050, 0.0076]",,

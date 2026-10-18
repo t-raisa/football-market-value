@@ -22,3 +22,4 @@ dependencies:
   - ipykernel=7.4.0
   - nbconvert=7.17.2
   - nbformat=5.11.1
+  - tectonic=0.17.0          # LaTeX engine used to compile paper/main.tex

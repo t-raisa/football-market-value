@@ -1,0 +1,7 @@
+,Spearman rho with log(fee / value at t),95% CI
+LightGBM predicted change,0.403,"[0.35, 0.46]"
+age × value curve predicted change,0.33,"[0.28, 0.39]"
+true 12-month change of the market value (reference),0.572,"[0.53, 0.62]"
+minus age (reference),0.377,"[0.32, 0.43]"
+difference LightGBM − curve,0.073,"[0.03, 0.11]"
+difference LightGBM − minus age,0.027,"[-0.01, 0.07]"

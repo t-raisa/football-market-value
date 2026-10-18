@@ -1,0 +1,8 @@
+baseline,statistic,val_MAE_change
+Naive (no change),-,0.4619
+Age-value curve,median,0.4117
+Age-value-league curve,median,0.4151
+Momentum,-,0.6466
+Momentum (damped),-,0.4749
+Age-value curve,mean,0.4111
+Age-value-league curve,mean,0.4145

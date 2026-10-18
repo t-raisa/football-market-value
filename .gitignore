@@ -12,3 +12,12 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 .DS_Store
+
+# LaTeX build files
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.pdf
+paper/*.synctex.gz

@@ -1,5 +1,9 @@
 ,n,R2_value_level,R2_change (main text)
 Naive (no change),12167,0.828,-0.0004
+Age-value curve,12167,0.8696,0.2416
+Age-value-league curve,12167,0.8716,0.2531
+Momentum,12167,0.6266,-1.172
+Momentum (damped),12167,0.8184,-0.0563
 Ridge regression,12167,0.8838,0.324
 Random Forest,12167,0.8897,0.3587
 LightGBM,12167,0.8854,0.3337
