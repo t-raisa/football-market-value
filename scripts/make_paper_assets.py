@@ -34,9 +34,14 @@ def tex(s: str) -> str:
     for a, b in [("\\", r"\textbackslash{}"), ("&", r"\&"), ("%", r"\%"), ("_", r"\_"), ("#", r"\#")]:
         s = s.replace(a, b)
     for a, b in [("≥", r"$\geq$"), ("≤", r"$\leq$"), ("−", "$-$"), ("±", r"$\pm$"), ("→", r"$\to$"),
-                 ("–", "--"), ("€", "EUR "), ("|", r"$|$"), ("ρ", r"$\rho$"), ("…", r"\dots{}")]:
+                 ("–", "--"), ("€", "EUR "), ("|", r"$|$"), ("ρ", r"$\rho$"), ("…", r"\dots{}"), ("×", r"$\times$")]:
         s = s.replace(a, b)
     return s
+
+
+def neg(s):
+    """Proper LaTeX minus sign for a formatted number."""
+    return s.replace("-", "$-$") if s.startswith("-") else s
 
 
 def ci_str(s, d=None):
@@ -112,37 +117,31 @@ put("NUnknownRows", num(unk.loc["rows", "unknown club"], 0))
 put("NUnknownTest", num(unk.loc["rows in test", "unknown club"], 0))
 
 # ----------------------------------------------------------------------------- main results
+import json
 res = r("table13_test_results_core", index_col=0)
 ci16 = r("table16_bootstrap_model_ci", index_col=0)
-order = [("Naive (no change)", "Naive", "Naive (no change)"), ("Ridge regression", "Ridge", "Ridge regression"),
-         ("Random Forest", "Random Forest", "Random forest"), ("XGBoost", "XGBoost", "XGBoost"),
-         ("CatBoost", "CatBoost", "CatBoost"), ("LightGBM", "LightGBM", "LightGBM"),
-         ("GRU (mean of 3 seeds)", "GRU", "GRU (mean of 3 seeds)"),
-         ("LightGBM + GRU average", "LightGBM + GRU", "LightGBM + GRU (average)")]
-lines = []
-for key, cikey, label in order:
+BEST = json.load(open(RES / "best_simple_baseline.json"))["best_simple_baseline"]
+MAIN_ROWS = [("Naive (no change)", "Naive", "No change"), (BEST, BEST, r"Age $\times$ value curve"),
+             ("Ridge regression", "Ridge", "Ridge"), ("Random Forest", "Random Forest", "Random forest"),
+             ("XGBoost", "XGBoost", "XGBoost"), ("CatBoost", "CatBoost", "CatBoost"), ("LightGBM", "LightGBM", "LightGBM"),
+             ("GRU (mean of 3 seeds)", "GRU", "GRU (small check)")]
+EXTRA_ROWS = [("Age-value-league curve", "Age-value-league curve", r"Age $\times$ value $\times$ league curve"),
+              ("Momentum", "Momentum", "Momentum"), ("Momentum (damped)", "Momentum (damped)", r"Momentum, damped ($\times$0.5)"),
+              ("LightGBM + GRU average", "LightGBM + GRU", "LightGBM + GRU (average)")]
+
+
+def result_line(key, cikey, label, full=False):
     x = res.loc[key]
     rank = (lambda c, d: "--" if pd.isna(x[c]) else num(x[c], d))
-    skill = "--" if key.startswith("Naive") else f"{num(x['skill_vs_naive_%'])} {ci_str(ci16.loc[cikey, 'skill 95% CI'])}"
-    lines.append(" & ".join([label, f"{num(x.MAE_change, 3)} {ci_str(ci16.loc[cikey, 'MAE 95% CI'], 3)}",
-                             num(x.R2_change, 2), rank("Spearman_change", 2), rank("top10_rise_prec_%", 1),
-                             rank("top10_fall_prec_%", 1), num(x.MAE_eur / 1e6, 2), num(x["MdAPE_%"], 1),
-                             num(x["within_20%"], 1), skill]) + r" \\")
-(OUT / "tab_results.tex").write_text(r"""\begin{table*}[t]
-\centering
-\caption{Test results on the 14 core leagues (valuation dates from July 2024; %s observations, %s players). MAE$_\Delta$: mean absolute error of the 12-month log change, with 95\%% player-level bootstrap CI. $\rho$: Spearman correlation of predicted and true change. P@10$\uparrow$/P@10$\downarrow$: share of the 10\%% largest predicted rises (falls) that truly rose (fell); base rates %s\%% and %s\%%. MdAPE: median absolute percentage error of the value in euros. $\pm$20\%%: share predicted within 20\%% of the true value. Skill: share of the naive MAE$_\Delta$ removed.}
-\label{tab:results}
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\resizebox{\textwidth}{!}{\begin{tabular}{lccccccccc}
-\toprule
-Model & MAE$_\Delta$ [95\%% CI] & $R^2_\Delta$ & $\rho$ & P@10$\uparrow$ & P@10$\downarrow$ & MAE (EUR m) & MdAPE (\%%) & $\pm$20\%% (\%%) & Skill (\%%) [95\%% CI] \\
-\midrule
-%s
-\bottomrule
-\end{tabular}}
-\end{table*}
-""" % (N["NTest"], N["NTestPlayers"], "{rose}", "{fell}", "\n".join(lines)))
+    s_naive = "--" if key.startswith("Naive") else neg(num(x["skill_vs_naive_%"], 1))
+    s_curve = "--" if key == BEST else f"{neg(num(x['skill_vs_best_simple_%']))} {ci_str(ci16.loc[cikey, 'skill vs best simple 95% CI'])}"
+    cells = [label, f"{num(x.MAE_change, 3)} {ci_str(ci16.loc[cikey, 'MAE 95% CI'], 3)}", s_naive, s_curve,
+             rank("Spearman_change", 2), rank("top10_rise_prec_%", 1), rank("top10_fall_prec_%", 1),
+             num(x["MdAPE_%"], 1), num(x["within_20%"], 1)]
+    if full:
+        cells += [num(x.R2_change, 2), num(x.MAE_eur / 1e6, 2)]
+    return " & ".join(cells) + r" \\"
+
 
 br = pd.read_parquet(PROC / "dataset_v1.parquet", columns=["y", "log_value", "split", "league_group"])
 br = br[(br.split == "test") & (br.league_group == "core")]
@@ -150,12 +149,58 @@ chg = (br.y - br.log_value).to_numpy()
 put("BaseRose", num(100 * (chg > 0).mean(), 1))
 put("BaseFell", num(100 * (chg < 0).mean(), 1))
 put("BaseSame", num(100 * (chg == 0).mean(), 1))
-t = (OUT / "tab_results.tex").read_text().replace("{rose}", N["BaseRose"]).replace("{fell}", N["BaseFell"])
-(OUT / "tab_results.tex").write_text(t)
+
+HEAD = (r"Model & MAE$_\Delta$ [95\% CI] & \multicolumn{2}{c}{Skill (\%) vs.} & $\rho$ & P@10$\uparrow$ & P@10$\downarrow$ "
+        r"& MdAPE & $\pm$20\% ")
+HEAD2 = r" & & no change & curve [95\% CI] & & (\%) & (\%) & (\%) & (\%) "
+CAPTION = (r"Test results on the 14 core leagues (valuation dates from July 2024; %s observations, %s players). "
+           r"MAE$_\Delta$: mean absolute error of the 12-month log change, with 95\%% player-level bootstrap CI. "
+           r"Skill: share of the reference's MAE$_\Delta$ removed; \emph{curve} is the age $\times$ value curve, "
+           r"the best simple baseline (chosen on validation). $\rho$: Spearman correlation of predicted and true change. "
+           r"P@10$\uparrow$/P@10$\downarrow$: share of the 10\%% largest predicted rises (falls) that truly rose (fell); "
+           r"base rates %s\%% and %s\%%. MdAPE: median absolute percentage error of the value in euros (main euro metric). "
+           r"$\pm$20\%%: share within 20\%% of the true value (errors of exactly 20\%% count as within, because values are rounded).") % (
+    N["NTest"], N["NTestPlayers"], N["BaseRose"], N["BaseFell"])
+lines = [result_line(*row) for row in MAIN_ROWS]
+lines.insert(2, r"\midrule")
+(OUT / "tab_results.tex").write_text(r"""\begin{table*}[t]
+\centering
+\caption{%s}
+\label{tab:results}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{\begin{tabular}{lcccccccc}
+\toprule
+%s\\
+%s\\
+\midrule
+%s
+\bottomrule
+\end{tabular}}
+\end{table*}
+""" % (CAPTION, HEAD, HEAD2, "\n".join(lines)))
+
+# full version for the supplement (all simple baselines, the ensemble, R^2 of the change, MAE in euros)
+lines = [result_line(*row, full=True) for row in MAIN_ROWS + EXTRA_ROWS]
+(OUT / "tab_s_results_full.tex").write_text(r"""\begin{table}[!h]
+\centering
+\caption{All models and baselines on the core-league test set (columns as in the main results table of the paper, plus $R^2$ of the change and the MAE in EUR million). Momentum sometimes predicts extreme changes, which explains its very large euro error.}
+\label{tab:s-results}
+\footnotesize
+\resizebox{\textwidth}{!}{\begin{tabular}{lcccccccccc}
+\toprule
+%s & $R^2_\Delta$ & MAE \\
+%s & & (EUR m) \\
+\midrule
+%s
+\bottomrule
+\end{tabular}}
+\end{table}
+""" % (HEAD, HEAD2, "\n".join(lines)))
 
 for key, short in [("Naive (no change)", "Naive"), ("Ridge regression", "Ridge"), ("Random Forest", "RF"),
                    ("XGBoost", "XGB"), ("CatBoost", "Cat"), ("LightGBM", "LGB"), ("GRU (mean of 3 seeds)", "GRU"),
-                   ("LightGBM + GRU average", "Ens")]:
+                   ("LightGBM + GRU average", "Ens"), (BEST, "Curve")]:
     x = res.loc[key]
     put(f"MAE{short}", num(x.MAE_change, 3))
     put(f"Within{short}", num(x["within_20%"], 1))
@@ -166,6 +211,17 @@ for key, short in [("Naive (no change)", "Naive"), ("Ridge regression", "Ridge")
         put(f"PRise{short}", num(x["top10_rise_prec_%"], 1))
         put(f"PFall{short}", num(x["top10_fall_prec_%"], 1))
         put(f"RsqChange{short}", num(x.R2_change, 2))
+    if key != BEST and not key.startswith("Naive"):
+        put(f"VsCurve{short}", num(x["skill_vs_best_simple_%"], 1))
+for cikey, short in [("LightGBM", "LGB"), ("XGBoost", "XGB"), ("CatBoost", "Cat"), ("Ridge", "Ridge"),
+                     ("Random Forest", "RF"), ("GRU", "GRU")]:
+    put(f"VsCurve{short}CI", ci_str(ci16.loc[cikey, "skill vs best simple 95% CI"]))
+put("SkillCurveCI", ci_str(ci16.loc[BEST, "skill 95% CI"]))
+put("SkillLGBCI", ci_str(ci16.loc["LightGBM", "skill 95% CI"]))
+put("SkillMomentum", num(res.loc["Momentum", "skill_vs_naive_%"], 1).replace("-", "$-$"))
+put("SkillMomentumDamped", num(res.loc["Momentum (damped)", "skill_vs_naive_%"], 1).replace("-", "$-$"))
+put("VsCurveLeagueCurve", num(res.loc["Age-value-league curve", "skill_vs_best_simple_%"], 1).replace("-", "$-$"))
+put("VsCurveLeagueCurveCI", ci_str(ci16.loc["Age-value-league curve", "skill vs best simple 95% CI"]))
 put("MAEeurNaive", num(res.loc["Naive (no change)", "MAE_eur"] / 1e6, 2))
 put("MAEeurLGB", num(res.loc["LightGBM", "MAE_eur"] / 1e6, 2))
 a1 = r("tableA1_value_level_r2", index_col=0)
@@ -175,6 +231,9 @@ gs = r("table12_gru_seeds", index_col=0)
 put("GRUsd", num(gs.loc["std", "MAE_change"], 3))
 best = pd.read_json(RES / "best_params.json")
 put("GRUepochs", str(int(best.loc["epochs", "GRU"])))
+t17b = r("table17b_vs_best_simple_baseline", index_col=0)
+put("DiffLGBCurve", num(t17b.loc["LightGBM", "MAE(model) − MAE(best simple)"], 4).replace("-", "$-$"))
+put("DiffLGBCurveCI", f"[{num(t17b.loc['LightGBM', '95% CI low'], 4)}, {num(t17b.loc['LightGBM', '95% CI high'], 4)}]".replace("-", "$-$"))
 
 pd17 = r("table17_bootstrap_paired_differences")
 def pair(a, b):
@@ -256,6 +315,10 @@ Split & Valuation date $t$ & Rows & Players \\
 \end{table}
 """ % "\n".join(lines))
 
+(OUT / "tab_data_inline.tex").write_text(                 # supplement version: no scaling, may stay on page 1
+    (OUT / "tab_data.tex").read_text().replace(r"\begin{table}[t]", r"\begin{table}[!h]")
+    .replace(r"\resizebox{\columnwidth}{!}{\begin{tabular}", r"\begin{tabular}").replace(r"\end{tabular}}", r"\end{tabular}"))
+
 # ----------------------------------------------------------------------------- groups, extra tests, unknown club
 g = r("table19_error_by_group")
 def gsk(grouping, group, col="skill_%"):
@@ -282,8 +345,8 @@ put("SkillCoreLeagueMax", num(corel["skill_%"].max(), 0))
 newl_pos = newl[newl["skill_%"] > 0]
 put("SkillNewLeagueMin", num(newl_pos["skill_%"].min(), 0))
 put("SkillNewLeagueMax", num(newl_pos["skill_%"].max(), 0))
-neg = newl[newl["skill_%"] <= 0]
-put("NewLeagueNegative", ", ".join(neg.group) if len(neg) else "none")
+neg_lg = newl[newl["skill_%"] <= 0]
+put("NewLeagueNegative", ", ".join(neg_lg.group) if len(neg_lg) else "none")
 
 t14 = r("table14_test_results_extra", index_col=[0, 1])
 put("SkillNewLeaguesLGB", num(t14.loc[("new leagues (17)", "LightGBM"), "skill_vs_naive_%"], 1))
@@ -333,9 +396,17 @@ for key, src, label in rows:
     lines.append(f"{label} & {int(x.features)} & {num(x.MAE_change, 4)} & {d} & {verdict}" + r" \\")
     if key.startswith("full"):
         lines.append(r"\midrule")
+    if key == "without club spending only":            # snapshot attributes (notebook 06, D2)
+        t36 = r("table36_without_snapshot_features", index_col=0)
+        lo36, hi36 = (float(v) for v in re.findall(r"-?\d+\.\d+", t36.loc["difference (without − with)", "skill vs curve 95% CI"]))
+        v36 = "n.s." if lo36 <= 0 <= hi36 else "worse"
+        lines.append(f"w/o snapshot attributes (4) & 46 & {num(t36.iloc[1].MAE, 4)} & "
+                     f"{num(t36.loc['difference (without − with)', 'MAE'], 4)} [{num(lo36, 5)}, {num(hi36, 4)}] & {v36}" + r" \\")
+        put("SnapDiff", num(t36.loc["difference (without − with)", "MAE"], 4))
+        put("SnapDiffCI", f"[{num(lo36, 5)}, {num(hi36, 4)}]")
 (OUT / "tab_ablation.tex").write_text(r"""\begin{table}[t]
 \centering
-\caption{Feature ablation (LightGBM, tuned settings, test 2024/25). $\Delta$MAE: change versus the full model with 95\%% paired player-level bootstrap CI; n.s.: CI contains 0.}
+\caption{Feature ablation (LightGBM, tuned settings, test 2024/25). $\Delta$MAE: change versus the full model with 95\%% paired player-level bootstrap CI; n.s.: CI contains 0. Snapshot attributes: position, sub-position, height and foot.}
 \label{tab:ablation}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -359,29 +430,38 @@ put("SkillHistOnly", num(ab.loc["value history only", "skill_vs_naive_%"], 1))
 f24 = r("table24_rolling_folds", index_col=0)
 t25 = r("table25_rolling_results", index_col=[0, 1])
 pair25 = r("table25b_rolling_lightgbm_vs_ridge", index_col=0)
+t25c = r("table25c_rolling_lightgbm_vs_best_simple", index_col=0)
 lines = []
 for y in f24.index:
-    nv, rg, lb = t25.loc[(y, "Naive")], t25.loc[(y, "Ridge")], t25.loc[(y, "LightGBM")]
-    lines.append(" & ".join([y.replace("/", "/"), num(f24.loc[y, "train rows"], 0), num(nv.n, 0), num(nv.MAE_change, 3),
-                             f"{num(rg['skill_vs_naive_%'])} {ci_str(rg['skill 95% CI'])}",
+    nv, cv, lb = t25.loc[(y, "Naive")], t25.loc[(y, BEST)], t25.loc[(y, "LightGBM")]
+    lines.append(" & ".join([y, num(f24.loc[y, "train rows"], 0), num(nv.n, 0), num(nv.MAE_change, 3),
+                             num(cv["skill_vs_naive_%"], 1),
                              f"{num(lb['skill_vs_naive_%'])} {ci_str(lb['skill 95% CI'])}",
-                             num(nv["within_20%"], 1), num(lb["within_20%"], 1)]) + r" \\")
+                             f"{num(t25c.loc[y, 'skill vs best simple %'], 1)} {ci_str(t25c.loc[y, 'skill 95% CI'])}"]) + r" \\")
 (OUT / "tab_rolling.tex").write_text(r"""\begin{table}[t]
 \centering
-\caption{Rolling-origin evaluation (LightGBM with settings fixed in advance). Skill with 95\%% player-level bootstrap CI.}
+\caption{Rolling-origin evaluation: six test years, each with its own training and validation period (LightGBM with settings fixed in advance). Skill with 95\%% player-level bootstrap CI.}
 \label{tab:rolling}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
-\resizebox{\columnwidth}{!}{\begin{tabular}{lrrcccrr}
+\resizebox{\columnwidth}{!}{\begin{tabular}{lrrcccc}
 \toprule
-Test year & Train & Test & Naive & \multicolumn{2}{c}{Skill (\%%) [95\%% CI]} & \multicolumn{2}{c}{$\pm$20\%% (\%%)} \\
- & rows & rows & MAE$_\Delta$ & Ridge & LGBM & Naive & LGBM \\
+Test & Train & Test & No-change & \multicolumn{3}{c}{Skill (\%%)} \\
+year & rows & rows & MAE$_\Delta$ & curve vs.\ & LGBM vs.\ & LGBM vs.\ \\
+ & & & & no change & no change & curve \\
 \midrule
 %s
 \bottomrule
 \end{tabular}}
 \end{table}
 """ % "\n".join(lines))
+put("RollVsCurveMin", num(t25c["skill vs best simple %"].min(), 1))
+put("RollVsCurveMax", num(t25c["skill vs best simple %"].max(), 1))
+put("RollVsCurveMean", num(t25c["skill vs best simple %"].mean(), 1))
+put("RollVsCurveWins", str(int((t25c.verdict == "LightGBM better").sum())))
+cvs = t25.xs(BEST, level="model")["skill_vs_naive_%"]
+put("RollCurveMin", num(cvs.min(), 1))
+put("RollCurveMax", num(cvs.max(), 1))
 sk = t25.xs("LightGBM", level="model")["skill_vs_naive_%"]
 skr = t25.xs("Ridge", level="model")["skill_vs_naive_%"]
 put("RollSkillMin", num(sk.min(), 1))
@@ -408,6 +488,188 @@ put("YoungFeeRatio", num(yg["median fee / value at t (sold)"], 1))
 put("UVFeeAbove", num(u["fee > value at t (% of sold)"], 0)); put("AllFeeAbove", num(al["fee > value at t (% of sold)"], 0))
 put("YoungFeeAbove", num(yg["fee > value at t (% of sold)"], 0))
 put("UVAge", num(u["median age"], 1))
+
+# ----------------------------------------------------------------------------- review checks (notebooks 04-06)
+def ci_parts(s):
+    lo, hi = (float(v) for v in re.findall(r"-?\d+\.?\d*", str(s)))
+    return lo, hi
+
+# groups: skill vs the age x value curve
+def gcurve(grouping, group):
+    row = g[(g.grouping == grouping) & (g.group == group)].iloc[0]
+    return row
+for grouping, group, short in [("age group", "<21", "U"), ("age group", "21–25", "A"), ("age group", "26–29", "B"),
+                               ("age group", "30+", "C"), ("real change", "fell >33%", "BigFall"),
+                               ("real change", "fell 10–33%", "ModFall"), ("real change", "rose 10–50%", "ModRise"),
+                               ("real change", "rose >50%", "BigRise"), ("value level", "cheap (<€1m)", "Cheap"),
+                               ("value level", "expensive (≥€10m)", "Expensive")]:
+    row = gcurve(grouping, group)
+    put(f"GrpVsCurve{short}", neg(num(row["skill_vs_best_%"], 1)))
+    put(f"GrpVsCurve{short}CI", f"[{num(row.skill_vs_best_lo, 1)}, {num(row.skill_vs_best_hi, 1)}]".replace("-", "$-$"))
+put("GrpVsNaiveC", num(gcurve("age group", "30+")["skill_%"], 1))
+pos = g[g.grouping == "position"]
+put("GrpPosVsCurveMin", num(pos["skill_vs_best_%"].min(), 1))
+put("GrpPosVsCurveMax", num(pos["skill_vs_best_%"].max(), 1))
+lgc = g[(g.grouping == "league") & (g.set == "core (in training)")]
+lgn = g[(g.grouping == "league") & (g.set == "new (not in training)")]
+put("CoreLgPosCount", str(int((lgc.skill_vs_best_lo > 0).sum())))
+put("CoreLgNeg", ", ".join(lgc.loc[lgc.skill_vs_best_hi < 0, "group"]) or "none")
+put("NewLgPosCount", str(int((lgn.skill_vs_best_lo > 0).sum())))
+put("NewLgNegCount", str(int((lgn.skill_vs_best_hi < 0).sum())))
+
+# ranking vs simple age rules
+rk = r("table23b_ranking_vs_age_rules", index_col=0)
+put("RankRiseLGB", num(rk.loc["LightGBM: top 10% predicted rises", "precision %"], 1))
+put("RankRiseYoung", num(rk.loc["Rule: youngest 10%", "precision %"], 1))
+put("RankRiseDiff", num(rk.loc["LightGBM: top 10% predicted rises", "minus rule (points)"], 1))
+put("RankRiseDiffCI", ci_str(rk.loc["LightGBM: top 10% predicted rises", "diff 95% CI"]))
+put("RankFallLGB", num(rk.loc["LightGBM: top 10% predicted falls", "precision %"], 1))
+put("RankFallOld", num(rk.loc["Rule: oldest 10%", "precision %"], 1))
+put("RankFallDiff", num(rk.loc["LightGBM: top 10% predicted falls", "minus rule (points)"], 1))
+put("RankFallDiffCI", ci_str(rk.loc["LightGBM: top 10% predicted falls", "diff 95% CI"]))
+put("RankRiseCurve", num(rk.loc[f"{BEST}: top 10% predicted rises", "precision %"], 1))
+
+# full-window sensitivity
+fw = r("table31_sensitivity_full_window", index_col=0)
+fwr = fw.loc["fully observable window only"]
+put("FullWinRows", num(fwr.rows, 0))
+put("FullWinVsNaive", num(fwr["LightGBM skill vs no change %"], 1))
+put("FullWinVsNaiveCI", ci_str(fwr["  95% CI"]))
+put("FullWinVsCurve", num(fwr["LightGBM skill vs curve %"], 1))
+put("FullWinVsCurveCI", ci_str(fwr["  95% CI "]))
+
+# forecast intervals: final uncalibrated (A) and calibrated by age group (D)
+cal = r("table33_conformal_calibration")
+def calrow(prefix, group):
+    return cal[(cal.interval.str.startswith(prefix)) & (cal.group == group)].iloc[0]
+A, D = calrow("A:", "all"), calrow("D:", "all")
+B_ = calrow("B:", "all")
+put("IntCovRaw", num(A["coverage %"], 1)); put("IntCovRawCI", ci_str(A["coverage 95% CI"]))
+put("IntCovCal", num(D["coverage %"], 1)); put("IntCovCalCI", ci_str(D["coverage 95% CI"]))
+put("IntWidthCal", num(D["median width / value at t (%)"], 0))
+put("IntWidthIncrease", num(100 * (D["median width (log)"] / B_["median width (log)"] - 1), 0))
+put("IntPinballCal", num(D["mean pinball"], 3))
+U, O = calrow("D:", "age <21"), calrow("D:", "age 30+")
+put("IntCovCalU", num(U["coverage %"], 1)); put("IntCovCalUCI", ci_str(U["coverage 95% CI"]))
+put("IntCovCalC", num(O["coverage %"], 1))
+put("IntBelowC", num(O["below q10 %"], 1)); put("IntAboveC", num(O["above q90 %"], 1))
+put("IntAboveU", num(U["above q90 %"], 1))
+iv = r("table32_forecast_intervals", index_col=0)
+put("IntPinballRef", num(iv.loc["age × value percentiles", "mean pinball"], 3))
+put("IntPinballRaw", num(iv.loc["LightGBM quantile", "mean pinball"], 3))
+put("NCalRows", "12{,}799")
+lines = []
+for grp_, glabel in [("all", "all"), ("age <21", "$<$21"), ("age 30+", "30+")]:
+    for prefix, label in [("A:", "final model, uncalibrated"), ("B:", "tuning-row model, uncalibrated"),
+                          ("C:", "B + calibration (overall)"), ("D:", "B + calibration (by age group)")]:
+        x = calrow(prefix, grp_)
+        lines.append(f"{glabel} & {label} & {num(x['coverage %'], 1)} {ci_str(x['coverage 95% CI'])} & "
+                     f"{num(x['below q10 %'], 1)} / {num(x['above q90 %'], 1)} & {num(x['median width (log)'], 2)} & "
+                     f"{num(x['mean pinball'], 3)}" + r" \\")
+    lines.append(r"\midrule")
+(OUT / "tab_s_calibration.tex").write_text(r"""\begin{table}[!h]
+\centering
+\caption{80\%% forecast intervals before and after conformal calibration (core test 2024/25). Calibration rows: %s training observations whose targets fall between July 2023 and June 2024, i.e. before the test period, and unseen by the calibrated model.}
+\label{tab:s-calibration}
+\footnotesize
+\begin{tabular}{llcccc}
+\toprule
+Age & Interval & Coverage (\%%) [95\%% CI] & Below / above (\%%) & Median width (log) & Mean pinball \\
+\midrule
+%s
+\bottomrule
+\end{tabular}
+\end{table}
+""" % (N["NCalRows"], "\n".join(lines[:-1])))
+
+# real-fee check
+fee = r("table37_real_fee_check", index_col=0)
+def fee_row(name, short):
+    put(f"FeeRho{short}", num(fee.loc[name].iloc[0], 2))
+    put(f"FeeRho{short}CI", ci_str(fee.loc[name].iloc[1], 2))
+fee_row("LightGBM predicted change", "LGB")
+fee_row("age × value curve predicted change", "Curve")
+fee_row("minus age (reference)", "Age")
+fee_row("true 12-month change of the market value (reference)", "True")
+fee_row("difference LightGBM − curve", "DiffCurve")
+fee_row("difference LightGBM − minus age", "DiffAge")
+put("FeeN", "2{,}100"); put("FeePlayers", "1{,}121")
+
+# dropped observations
+dc = pd.read_csv(RES / "table27_dropped_rows_counts.csv", index_col=[0, 1])
+tc = dc.loc[("14 core leagues", "test")]
+put("DropRateTest", num(tc["genuine drop rate (% of complete-window rows)"], 1))
+put("DropTest", num(tc["dropped: no valuation in window"], 0))
+put("DropTestComplete", num(tc["kept"] + tc["dropped: no valuation in window"], 0))
+put("KeptPartial", num(tc["kept (window partly after data end)"], 0))
+lc = r("table29_dropped_rows_later_change", index_col=0)
+k_, d_ = lc.loc["kept (12-month target), all"], lc.loc["genuine drops with a later valuation ≤18m, all"]
+put("DropFell", num(d_["fell %"], 0)); put("DropRose", num(d_["rose %"], 0))
+put("KeptFell", num(k_["fell %"], 0)); put("KeptRose", num(k_["rose %"], 0))
+ba = pd.read_csv(RES / "table29b_dropped_rows_later_change_by_age.csv", header=[0, 1], index_col=0)
+put("DropYoungMedian", num(ba.loc["<21", ("median", "dropped")], 2))
+put("KeptYoungMedian", num(ba.loc["<21", ("median", "kept")], 2))
+lines = []
+for period in ["train", "val", "test", "all periods"]:
+    x = dc.loc[("14 core leagues", period)]
+    lines.append(f"{period} & {num(x['kept'], 0)} & {num(x['kept (window partly after data end)'], 0)} & "
+                 f"{num(x['dropped: no valuation in window'], 0)} & {num(x['dropped: window after data end'], 0)} & "
+                 f"{num(x['genuine drop rate (% of complete-window rows)'], 1)}" + r" \\")
+(OUT / "tab_s_dropped.tex").write_text(r"""\begin{table}[!h]
+\centering
+\caption{Observations kept and dropped (14 core leagues, valuation dates from July 2014). A genuine drop has a fully observable 10--14-month window without a valuation in it; data-end drops have no target yet because the data end in June 2026.}
+\label{tab:s-dropped}
+\footnotesize
+\begin{tabular}{lrrrrr}
+\toprule
+Period & Kept & Kept (window partly & Genuine & Dropped at & Genuine drop \\
+ & & after data end) & drops & data end & rate (\%%) \\
+\midrule
+%s
+\bottomrule
+\end{tabular}
+\end{table}
+""" % "\n".join(lines))
+
+# 17 new leagues
+nc = r("table34_new_league_feature_coverage", index_col=0)
+put("NewWindowCov", num(nc.loc["17 new leagues (test)", "365-day window covered by match data (mean %)"], 1))
+put("NewZeroMin", num(nc.loc["17 new leagues (test)", "minutes_365 = 0 (%)"], 1))
+put("CoreZeroMin", num(nc.loc["core leagues (test)", "minutes_365 = 0 (%)"], 1))
+put("NewNoApp", num(nc.loc["17 new leagues (test)", "no appearance on record (%)"], 0))
+np_ = r("table35_new_leagues_without_performance")
+def nlrow(test_set, model):
+    return np_[(np_["test set"] == test_set) & (np_.model == model)].iloc[0]
+full_nl, noperf_nl = nlrow("17 new leagues", "LightGBM (all 50 features)"), nlrow("17 new leagues", "LightGBM without performance")
+put("NewVsCurve", num(full_nl["skill vs curve %"], 1)); put("NewVsCurveCI", ci_str(full_nl["  CI "]))
+put("NewVsNaive", num(full_nl["skill vs no change %"], 1))
+put("NewNoPerfVsCurve", num(noperf_nl["skill vs curve %"], 1)); put("NewNoPerfVsCurveCI", ci_str(noperf_nl["  CI "]))
+put("NewCurveVsNaive", num(nlrow("17 new leagues", "age × value curve")["skill vs no change %"], 1))
+lines = []
+for ts in ["14 core leagues", "17 new leagues"]:
+    for model in ["age × value curve", "LightGBM (all 50 features)", "LightGBM without performance"]:
+        x = nlrow(ts, model)
+        vc = "--" if model.startswith("age") else f"{num(x['skill vs curve %'], 1)} {ci_str(x['  CI '])}"
+        lines.append(f"{ts} & {tex(model)} & {num(x.MAE, 4)} & {num(x['skill vs no change %'], 1)} {ci_str(x['  CI'])} & {vc}" + r" \\")
+    lines.append(r"\midrule")
+(OUT / "tab_s_newleagues.tex").write_text(r"""\begin{table}[!h]
+\centering
+\caption{Test results with and without the performance features. In the 17 new leagues, on average only %s\%% of the 365-day window has match data, and %s\%% of observations show zero minutes (core leagues: %s\%%).}
+\label{tab:s-newleagues}
+\footnotesize
+\begin{tabular}{llccc}
+\toprule
+Test set & Model & MAE$_\Delta$ & Skill vs.\ no change (\%%) & Skill vs.\ curve (\%%) \\
+\midrule
+%s
+\bottomrule
+\end{tabular}
+\end{table}
+""" % (N["NewWindowCov"], N["NewZeroMin"], N["CoreZeroMin"], "\n".join(lines[:-1])))
+
+# reproducibility counts
+put("NResultTables", str(len(list((ROOT / "reference_results").glob("*.csv"))) + len(list((ROOT / "reference_results").glob("*.json")))))
+put("NFigures", str(len(list((ROOT / "figures").glob("*.png")))))
 
 # ----------------------------------------------------------------------------- ties at exactly 20%
 p = pd.read_parquet(PROC / "predictions_test.parquet")

@@ -1,0 +1,62 @@
+\begin{table*}[t]
+\centering
+\caption{The 50 features. Every feature uses only records dated on or before the valuation date $t$.}
+\label{tab:features}
+\scriptsize
+\begin{tabular}{llp{11.5cm}}
+\toprule
+Feature & Group & Description \\
+\midrule
+\texttt{age} & player & Age in years at t (from date of birth) \\
+\texttt{height\_cm} & player & Height in cm (time-invariant) \\
+\texttt{position} & player & Main position: Goalkeeper / Defender / Midfield / Attack \\
+\texttt{sub\_position} & player & Detailed position, e.g. Centre-Back, Left Winger \\
+\texttt{foot} & player & Preferred foot \\
+\texttt{is\_foreign} & player & 1 if citizenship differs from the country of the league at t \\
+\texttt{log\_value} & value history & log market value at t \\
+\texttt{log\_value\_6m\_ago} & value history & log value of the last valuation dated 120-270 days before t \\
+\texttt{log\_value\_12m\_ago} & value history & log value of the last valuation dated 300-450 days before t \\
+\texttt{growth\_6m} & value history & log\_value - log\_value\_6m\_ago \\
+\texttt{growth\_12m} & value history & log\_value - log\_value\_12m\_ago \\
+\texttt{log\_max\_value\_so\_far} & value history & Highest log value up to t \\
+\texttt{value\_vs\_max} & value history & log\_value - log\_max\_value\_so\_far (0 = at career peak) \\
+\texttt{n\_valuations\_so\_far} & value history & Number of valuations up to t \\
+\texttt{days\_since\_prev\_valuation} & value history & Days since the previous valuation \\
+\texttt{change\_since\_prev\_valuation} & value history & log change since the previous valuation \\
+\texttt{years\_since\_first\_valuation} & value history & Years since the first valuation \\
+\texttt{matches\_365} & performance & Matches played in the last 365 days (all competitions) \\
+\texttt{minutes\_365} & performance & Minutes played in the last 365 days \\
+\texttt{goals\_365} & performance & Goals in the last 365 days \\
+\texttt{assists\_365} & performance & Assists in the last 365 days \\
+\texttt{ga\_per90\_365} & performance & (Goals + assists) per 90 minutes, last 365 days \\
+\texttt{yellow\_365} & performance & Yellow cards in the last 365 days \\
+\texttt{red\_365} & performance & Red cards in the last 365 days \\
+\texttt{league\_matches\_365} & performance & Domestic-league matches in the last 365 days \\
+\texttt{league\_minutes\_365} & performance & Domestic-league minutes in the last 365 days \\
+\texttt{league\_ga\_per90\_365} & performance & Domestic-league (goals + assists) per 90, last 365 days \\
+\texttt{other\_comp\_minutes\_365} & performance & Minutes in cups / European competitions, last 365 days \\
+\texttt{minutes\_prev\_365} & performance & Minutes played 365-730 days before t \\
+\texttt{minutes\_change} & performance & minutes\_365 - minutes\_prev\_365 \\
+\texttt{ga\_per90\_prev\_365} & performance & (Goals + assists) per 90, 365-730 days before t \\
+\texttt{days\_since\_last\_appearance} & performance & Days since the last recorded match \\
+\texttt{n\_transfers\_so\_far} & transfers & Number of the player's transfers up to t \\
+\texttt{days\_since\_last\_transfer} & transfers & Days since the player's last transfer \\
+\texttt{log\_last\_transfer\_fee} & transfers & log(1 + fee) of the player's last transfer \\
+\texttt{log\_max\_transfer\_fee} & transfers & log(1 + highest fee) ever paid for the player up to t \\
+\texttt{club\_known} & club/league & 1 if the club at t is known (from a transfer or match on/before t), else 0 \\
+\texttt{league\_t} & club/league & League at t (from the club's league games); OTHER / UNKNOWN otherwise \\
+\texttt{club\_log\_spend\_3y} & club/league & log(1 + fees paid by the club) in the last 3 years \\
+\texttt{club\_log\_income\_3y} & club/league & log(1 + fees received by the club) in the last 3 years \\
+\texttt{club\_net\_spend\_3y\_m} & club/league & Club net transfer spend in the last 3 years (EUR million) \\
+\texttt{club\_games\_365} & club/league & Club matches in the data in the last 365 days \\
+\texttt{club\_win\_rate\_365} & club/league & Club win rate in the last 365 days \\
+\texttt{club\_gd\_per\_game\_365} & club/league & Club goal difference per game, last 365 days \\
+\texttt{club\_mean\_log\_value} & club/league & Mean log value of the club's players (latest month-end snapshot) \\
+\texttt{club\_log\_total\_value} & club/league & log total squad value (latest month-end snapshot) \\
+\texttt{club\_n\_valued\_players} & club/league & Number of valued players at the club (snapshot) \\
+\texttt{value\_vs\_club\_mean} & club/league & log\_value - club\_mean\_log\_value \\
+\texttt{league\_median\_log\_value} & club/league & Median log value in the player's league (snapshot) \\
+\texttt{value\_vs\_league\_median} & club/league & log\_value - league\_median\_log\_value \\
+\bottomrule
+\end{tabular}
+\end{table*}

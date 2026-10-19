@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\caption{Rolling-origin evaluation: six test years, each with its own training and validation period (LightGBM with settings fixed in advance). Skill with 95\% player-level bootstrap CI.}
+\label{tab:rolling}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\resizebox{\columnwidth}{!}{\begin{tabular}{lrrcccc}
+\toprule
+Test & Train & Test & No-change & \multicolumn{3}{c}{Skill (\%)} \\
+year & rows & rows & MAE$_\Delta$ & curve vs.\ & LGBM vs.\ & LGBM vs.\ \\
+ & & & & no change & no change & curve \\
+\midrule
+2019/20 & 48{,}312 & 11{,}868 & 0.443 & 8.2 & 11.5 [10.3, 12.7] & 3.6 [2.6, 4.4] \\
+2020/21 & 58{,}580 & 15{,}286 & 0.452 & 6.6 & 13.4 [12.4, 14.4] & 7.3 [6.5, 8.0] \\
+2021/22 & 71{,}442 & 13{,}355 & 0.443 & 7.9 & 15.8 [14.4, 17.1] & 8.6 [7.5, 9.7] \\
+2022/23 & 86{,}687 & 12{,}691 & 0.467 & 9.7 & 14.2 [12.7, 15.6] & 5.0 [4.0, 6.0] \\
+2023/24 & 99{,}933 & 11{,}711 & 0.462 & 11.0 & 14.7 [13.3, 16.2] & 4.2 [3.0, 5.3] \\
+2024/25 & 112{,}775 & 12{,}167 & 0.480 & 12.0 & 17.1 [15.7, 18.4] & 5.8 [4.8, 6.8] \\
+\bottomrule
+\end{tabular}}
+\end{table}

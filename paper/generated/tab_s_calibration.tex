@@ -1,0 +1,26 @@
+\begin{table}[!h]
+\centering
+\caption{80\% forecast intervals before and after conformal calibration (core test 2024/25). Calibration rows: 12{,}799 training observations whose targets fall between July 2023 and June 2024, i.e. before the test period, and unseen by the calibrated model.}
+\label{tab:s-calibration}
+\footnotesize
+\begin{tabular}{llcccc}
+\toprule
+Age & Interval & Coverage (\%) [95\% CI] & Below / above (\%) & Median width (log) & Mean pinball \\
+\midrule
+all & final model, uncalibrated & 77.6 [76.8, 78.5] & 11.5 / 11.0 & 1.06 & 0.127 \\
+all & tuning-row model, uncalibrated & 77.1 [76.3, 78.0] & 12.0 / 10.9 & 1.05 & 0.128 \\
+all & B + calibration (overall) & 79.7 [78.9, 80.6] & 10.5 / 9.8 & 1.12 & 0.128 \\
+all & B + calibration (by age group) & 80.0 [79.2, 80.9] & 10.4 / 9.6 & 1.13 & 0.127 \\
+\midrule
+$<$21 & final model, uncalibrated & 74.8 [72.3, 77.1] & 9.5 / 15.7 & 1.68 & 0.205 \\
+$<$21 & tuning-row model, uncalibrated & 73.9 [71.4, 76.2] & 9.8 / 16.3 & 1.67 & 0.206 \\
+$<$21 & B + calibration (overall) & 76.5 [74.1, 78.7] & 8.5 / 15.1 & 1.74 & 0.205 \\
+$<$21 & B + calibration (by age group) & 77.6 [75.2, 79.8] & 8.1 / 14.3 & 1.80 & 0.205 \\
+\midrule
+30+ & final model, uncalibrated & 81.4 [79.4, 83.2] & 13.9 / 4.8 & 0.84 & 0.088 \\
+30+ & tuning-row model, uncalibrated & 81.7 [79.9, 83.5] & 14.9 / 3.4 & 0.86 & 0.090 \\
+30+ & B + calibration (overall) & 84.4 [82.5, 86.0] & 13.0 / 2.6 & 0.93 & 0.091 \\
+30+ & B + calibration (by age group) & 81.8 [79.9, 83.5] & 14.8 / 3.4 & 0.86 & 0.090 \\
+\bottomrule
+\end{tabular}
+\end{table}

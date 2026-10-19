@@ -1,0 +1,71 @@
+% Supplementary material (generated tables, see scripts/make_paper_assets.py; figures from ../figures).
+\documentclass[conference,onecolumn]{IEEEtran}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\graphicspath{{../figures/}{figures/}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\input{generated/numbers}
+\begin{document}
+\title{Supplementary Material: Forecasting Football Player Market Values from Public Transfermarkt Data}
+\author{Tasnim Nahar Raisa}
+\maketitle
+
+\section*{S1. Data and features}
+Table~\ref{tab:data} gives the observations per split, and Table~\ref{tab:features} lists all \NFeatures{} features. Every feature uses only records dated on or before the valuation date $t$. This was verified with the cut-the-future test described in the main paper.
+\input{generated/tab_data_inline}
+\input{generated/tab_features_inline}
+
+\clearpage
+\section*{S2. Additional results}
+\begin{itemize}
+\item Table~\ref{tab:s-results}: all models and simple baselines, including the age $\times$ value $\times$ league curve, momentum and the LightGBM + GRU average.
+\item Table~\ref{tab:s-calibration}: forecast intervals before and after conformal calibration.
+\item Table~\ref{tab:s-dropped}: observations kept and dropped.
+\item Table~\ref{tab:s-newleagues}: results with and without the performance features in the core and the new leagues.
+\end{itemize}
+\input{generated/tab_s_results_full}
+\input{generated/tab_s_calibration}
+\input{generated/tab_s_dropped}
+\input{generated/tab_s_newleagues}
+
+\clearpage
+\section*{S3. Additional figures}
+\begin{itemize}
+\item Fig.~\ref{fig:s-rolling}: the rolling-origin evaluation of the main paper, as a figure.
+\item Fig.~\ref{fig:s-league}: the skill of LightGBM per league, against both references.
+\item Fig.~\ref{fig:s-intervals}: forecast intervals for 50 random test players.
+\item Fig.~\ref{fig:s-uv}: the ``undervalued'' check (value change and later transfers for the 10\% largest predicted rises and falls).
+\end{itemize}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.75\textwidth]{fig13_rolling_origin.png}
+\caption{Rolling-origin evaluation. Left: error of the no-change forecast per test year. Right: skill against no change of the age $\times$ value curve, ridge and LightGBM, with 95\% player-level bootstrap intervals.}
+\label{fig:s-rolling}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.6\textwidth]{fig08_gain_by_league.png}
+\caption{LightGBM skill by league at $t$ (test period), against no change and against the age $\times$ value curve, with 95\% player-level bootstrap intervals. Below the dashed line: the 14 core leagues used for training; above: the 17 new leagues.}
+\label{fig:s-league}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{fig15_forecast_intervals.png}
+\caption{Uncalibrated 80\% forecast intervals (LightGBM quantile models) and true values 12 months later for 50 random test players.}
+\label{fig:s-intervals}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.75\textwidth]{fig12_undervalued_check.png}
+\caption{Share of players whose value rose within 12 months, and share sold for a fee within 12 months: the 10\% largest predicted rises and falls, the middle 80\%, and the youngest 10\%.}
+\label{fig:s-uv}
+\end{figure}
+
+\end{document}

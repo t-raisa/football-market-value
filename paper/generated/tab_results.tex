@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\centering
+\caption{Test results on the 14 core leagues (valuation dates from July 2024; 12{,}167 observations, 6{,}292 players). MAE$_\Delta$: mean absolute error of the 12-month log change, with 95\% player-level bootstrap CI. Skill: share of the reference's MAE$_\Delta$ removed; \emph{curve} is the age $\times$ value curve, the best simple baseline (chosen on validation). $\rho$: Spearman correlation of predicted and true change. P@10$\uparrow$/P@10$\downarrow$: share of the 10\% largest predicted rises (falls) that truly rose (fell); base rates 35.4\% and 51.5\%. MdAPE: median absolute percentage error of the value in euros (main euro metric). $\pm$20\%: share within 20\% of the true value (errors of exactly 20\% count as within, because values are rounded).}
+\label{tab:results}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{\begin{tabular}{lcccccccc}
+\toprule
+Model & MAE$_\Delta$ [95\% CI] & \multicolumn{2}{c}{Skill (\%) vs.} & $\rho$ & P@10$\uparrow$ & P@10$\downarrow$ & MdAPE & $\pm$20\% \\
+ & & no change & curve [95\% CI] & & (\%) & (\%) & (\%) & (\%) \\
+\midrule
+No change & 0.480 [0.469, 0.491] & -- & $-$13.6 [$-$15.0, $-$12.2] & -- & -- & -- & 37.5 & 32.2 \\
+Age $\times$ value curve & 0.423 [0.412, 0.432] & 12.0 & -- & 0.51 & 63.6 & 92.6 & 31.3 & 35.3 \\
+\midrule
+Ridge & 0.407 [0.398, 0.416] & 15.1 & 3.6 [2.8, 4.3] & 0.56 & 68.8 & 90.6 & 30.5 & 35.0 \\
+Random forest & 0.400 [0.391, 0.409] & 16.6 & 5.3 [4.4, 6.2] & 0.59 & 69.8 & 96.5 & 29.5 & 35.8 \\
+XGBoost & 0.395 [0.386, 0.404] & 17.7 & 6.5 [5.7, 7.4] & 0.58 & 71.7 & 95.2 & 28.5 & 37.3 \\
+CatBoost & 0.395 [0.385, 0.403] & 17.7 & 6.6 [5.7, 7.4] & 0.58 & 72.1 & 95.7 & 28.1 & 37.6 \\
+LightGBM & 0.394 [0.384, 0.403] & 17.9 & 6.8 [6.0, 7.6] & 0.58 & 73.0 & 95.6 & 28.1 & 37.8 \\
+GRU (small check) & 0.397 [0.389, 0.406] & 17.2 & 6.0 [5.1, 7.0] & 0.57 & 72.6 & 93.5 & 28.2 & 37.8 \\
+\bottomrule
+\end{tabular}}
+\end{table*}

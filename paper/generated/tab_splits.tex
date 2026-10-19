@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{Same model (LightGBM, fixed settings) under three splits of the core-league data. Skill with 95\% player-level bootstrap CI.}
+\label{tab:splits}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\resizebox{\columnwidth}{!}{\begin{tabular}{llrccccc}
+\toprule
+Split & Test rows & $n$ & \multicolumn{2}{c}{MAE$_\Delta$} & Skill (\%) & \multicolumn{2}{c}{$\pm$20\% (\%)} \\
+ & & & Naive & LGBM & [95\% CI] & Naive & LGBM \\
+\midrule
+Time split (ours) & all & 12{,}167 & 0.480 & 0.398 & 17.1 [15.7, 18.5] & 32.2 & 36.4 \\
+Random rows & all & 27{,}266 & 0.448 & 0.359 & 19.7 [18.9, 20.5] & 35.0 & 39.6 \\
+ & $t\geq$ 7/2024 & 2{,}472 & 0.488 & 0.372 & 23.8 [21.3, 26.1] & 31.7 & 38.9 \\
+Random players & all & 27{,}268 & 0.452 & 0.373 & 17.5 [16.4, 18.5] & 34.6 & 38.5 \\
+ & $t\geq$ 7/2024 & 2{,}512 & 0.502 & 0.403 & 19.7 [16.7, 22.6] & 30.6 & 36.7 \\
+\bottomrule
+\end{tabular}}
+\end{table}
