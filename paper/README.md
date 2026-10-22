@@ -30,5 +30,5 @@ cd paper && ~/miniforge3/envs/football/bin/tectonic main.tex && ~/miniforge3/env
 
 ## Still to do before submission
 
-- Fill in the red `[TODO: ...]` items: email and the code repository URL.
+- The code link points to https://github.com/t-raisa/football-market-value, which is still private. Make it public before submission (or use an anonymous link if the venue is double-blind).
 - The main paper is 6 pages including references. Check the venue's exact limit (some count references separately).

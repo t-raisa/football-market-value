@@ -192,7 +192,7 @@ We forecast a community estimate, which is only partly related to transfer fees~
 Public Transfermarkt data support a reproducible 12-month forecasting benchmark, provided that leaking snapshot columns are removed and the evaluation uses a strict time split. A simple age $\times$ value curve captures most of the predictable change. Gradient-boosted trees add a consistent \RollVsCurveMin--\RollVsCurveMax\% on top of it in every test year, mostly for young players and for falls, but little in leagues outside the training data. Random splits overstate accuracy through repeated players, and against actual fees the forecasts beat the curve but not age alone. We hope the benchmark makes such comparisons easy to repeat.
 
 \section*{Data and Code Availability}
-The data are the public Kaggle dataset~\cite{kaggle_transfermarkt}; SHA-256 checksums identify the exact version. One script checks the data version and rebuilds all \NResultTables{} result tables and \NFigures{} figures. The code is available at \todo{code repository URL}.
+The data are the public Kaggle dataset~\cite{kaggle_transfermarkt}; SHA-256 checksums identify the exact version. One script checks the data version and rebuilds all \NResultTables{} result tables and \NFigures{} figures. The code is available at \url{https://github.com/t-raisa/football-market-value}.
 
 \IEEEtriggeratref{18}    % balance the two columns on the last page
 \bibliographystyle{IEEEtran}
