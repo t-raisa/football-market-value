@@ -151,6 +151,10 @@ If your conda environment is not in `~/miniforge3/envs/football`, set `FOOTBALL_
 | Forecast intervals and conformal calibration | table32, table32b, table33 | fig15 |
 | New-league feature gap, snapshot features, real fees | table34–table37 | – |
 
+## License
+
+The code is released under the MIT License (see `LICENSE`). The data are not included in this repository; they follow the license of the Kaggle dataset.
+
 ## Citation
 
 *Add the paper's reference here once it is published.*
