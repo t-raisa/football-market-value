@@ -1,23 +1,23 @@
 \begin{table}[t]
 \centering
-\caption{Feature ablation (LightGBM, tuned settings, test 2024/25). $\Delta$MAE: change versus the full model with 95\% paired player-level bootstrap CI; n.s.: CI contains 0. Snapshot attributes: position, sub-position, height and foot.}
+\caption{Feature ablation (LightGBM, tuned settings, test 2024/25). $\Delta$MAE is the change versus the full model with a 95\% paired player-level bootstrap CI. ``n.s.'' means the CI contains 0. Snapshot attributes are position, sub-position, height and foot.}
 \label{tab:ablation}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \resizebox{\columnwidth}{!}{\begin{tabular}{lrcll}
 \toprule
-Variant & Feat. & MAE$_\Delta$ & $\Delta$MAE [95\% CI] & \\
+Variant & Features & MAE$_\Delta$ & $\Delta$MAE [95\% CI] & Effect \\
 \midrule
 Full model & 50 & 0.3940 & -- & -- \\
 \midrule
-w/o value history & 39 & 0.4029 & 0.0089 [0.0070, 0.0109] & worse \\
-w/o performance & 35 & 0.4004 & 0.0064 [0.0051, 0.0077] & worse \\
-w/o player attributes & 44 & 0.3992 & 0.0052 [0.0039, 0.0066] & worse \\
-w/o club/league & 36 & 0.3979 & 0.0039 [0.0021, 0.0056] & worse \\
-w/o player transfer history & 46 & 0.3944 & 0.0004 [$-$0.0012, 0.0020] & n.s. \\
-w/o club transfer finance (3) & 47 & 0.3946 & 0.0006 [$-$0.0001, 0.0012] & n.s. \\
-w/o club spending only & 49 & 0.3943 & 0.0003 [$-$0.0004, 0.0009] & n.s. \\
-w/o snapshot attributes (4) & 46 & 0.3951 & 0.0011 [0.00003, 0.0021] & worse \\
+No value history & 39 & 0.4029 & 0.0089 [0.0070, 0.0109] & worse \\
+No performance & 35 & 0.4004 & 0.0064 [0.0051, 0.0077] & worse \\
+No player attributes & 44 & 0.3992 & 0.0052 [0.0039, 0.0066] & worse \\
+No club/league & 36 & 0.3979 & 0.0039 [0.0021, 0.0056] & worse \\
+No player transfer history & 46 & 0.3944 & 0.0004 [$-$0.0012, 0.0020] & n.s. \\
+No club transfer finance (3) & 47 & 0.3946 & 0.0006 [$-$0.0001, 0.0012] & n.s. \\
+Club spending removed & 49 & 0.3943 & 0.0003 [$-$0.0004, 0.0009] & n.s. \\
+Snapshot attributes removed (4) & 46 & 0.3951 & 0.0011 [0.00003, 0.0021] & worse \\
 Value history only & 11 & 0.4099 & 0.0158 [0.0130, 0.0187] & worse \\
 Value history + age & 12 & 0.4045 & 0.0105 [0.0077, 0.0130] & worse \\
 \bottomrule

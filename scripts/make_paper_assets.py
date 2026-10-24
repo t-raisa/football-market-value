@@ -153,13 +153,13 @@ put("BaseSame", num(100 * (chg == 0).mean(), 1))
 HEAD = (r"Model & MAE$_\Delta$ [95\% CI] & \multicolumn{2}{c}{Skill (\%) vs.} & $\rho$ & P@10$\uparrow$ & P@10$\downarrow$ "
         r"& MdAPE & $\pm$20\% ")
 HEAD2 = r" & & no change & curve [95\% CI] & & (\%) & (\%) & (\%) & (\%) "
-CAPTION = (r"Test results on the 14 core leagues (valuation dates from July 2024; %s observations, %s players). "
-           r"MAE$_\Delta$: mean absolute error of the 12-month log change, with 95\%% player-level bootstrap CI. "
-           r"Skill: share of the reference's MAE$_\Delta$ removed; \emph{curve} is the age $\times$ value curve, "
-           r"the best simple baseline (chosen on validation). $\rho$: Spearman correlation of predicted and true change. "
-           r"P@10$\uparrow$/P@10$\downarrow$: share of the 10\%% largest predicted rises (falls) that truly rose (fell); "
-           r"base rates %s\%% and %s\%%. MdAPE: median absolute percentage error of the value in euros (main euro metric). "
-           r"$\pm$20\%%: share within 20\%% of the true value (errors of exactly 20\%% count as within, because values are rounded).") % (
+CAPTION = (r"Test results on the 14 core leagues (valuation dates from July 2024, %s observations, %s players). "
+           r"MAE$_\Delta$ is the mean absolute error of the 12-month log change, with a 95\%% player-level bootstrap CI. "
+           r"Skill is the share of the reference's MAE$_\Delta$ removed, where ``curve'' is the age $\times$ value curve, "
+           r"the best simple baseline on validation. $\rho$ is the Spearman correlation of predicted and true change. "
+           r"P@10$\uparrow$ and P@10$\downarrow$ give the share of the 10\%% largest predicted rises (falls) that truly rose (fell), "
+           r"with base rates of %s\%% and %s\%%. MdAPE is the median absolute percentage error of the value in euros. "
+           r"$\pm$20\%% is the share within 20\%% of the true value, with errors of exactly 20\%% counted as within because values are rounded.") % (
     N["NTest"], N["NTestPlayers"], N["BaseRose"], N["BaseFell"])
 lines = [result_line(*row) for row in MAIN_ROWS]
 lines.insert(2, r"\midrule")
@@ -265,7 +265,7 @@ for label, scheme, sub8, sub18, sub_label in rows:
                              num(nv["within_20%"], 1), num(lg["within_20%"], 1)]) + r" \\")
 (OUT / "tab_splits.tex").write_text(r"""\begin{table}[t]
 \centering
-\caption{Same model (LightGBM, fixed settings) under three splits of the core-league data. Skill with 95\%% player-level bootstrap CI.}
+\caption{The same model (LightGBM with fixed settings) under three splits of the core-league data. Skill is shown with a 95\%% player-level bootstrap CI. Because settings are fixed, the time-split numbers differ slightly from the tuned model in Table~\ref{tab:results}.}
 \label{tab:splits}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
@@ -379,11 +379,11 @@ ab = r("table26_feature_group_ablation", index_col=0)
 ab2 = r("table26b_club_spending_ablation", index_col=0)
 ov = r("table26c_club_spending_overlap", index_col=0)
 put("SpendTotalValueCorr", num(ov.loc["club_log_spend_3y", "club_log_total_value"], 2))
-rows = [("full model (50 features)", ab, "Full model"), ("without value history", ab, "w/o value history"),
-        ("without performance", ab, "w/o performance"), ("without player", ab, "w/o player attributes"),
-        ("without club/league", ab, "w/o club/league"), ("without transfers", ab, "w/o player transfer history"),
-        ("without club finance (3 features)", ab2, "w/o club transfer finance (3)"),
-        ("without club spending only", ab2, "w/o club spending only"),
+rows = [("full model (50 features)", ab, "Full model"), ("without value history", ab, "No value history"),
+        ("without performance", ab, "No performance"), ("without player", ab, "No player attributes"),
+        ("without club/league", ab, "No club/league"), ("without transfers", ab, "No player transfer history"),
+        ("without club finance (3 features)", ab2, "No club transfer finance (3)"),
+        ("without club spending only", ab2, "Club spending removed"),
         ("value history only", ab, "Value history only"), ("value history + age", ab, "Value history + age")]
 lines = []
 for key, src, label in rows:
@@ -400,19 +400,19 @@ for key, src, label in rows:
         t36 = r("table36_without_snapshot_features", index_col=0)
         lo36, hi36 = (float(v) for v in re.findall(r"-?\d+\.\d+", t36.loc["difference (without − with)", "skill vs curve 95% CI"]))
         v36 = "n.s." if lo36 <= 0 <= hi36 else "worse"
-        lines.append(f"w/o snapshot attributes (4) & 46 & {num(t36.iloc[1].MAE, 4)} & "
+        lines.append(f"Snapshot attributes removed (4) & 46 & {num(t36.iloc[1].MAE, 4)} & "
                      f"{num(t36.loc['difference (without − with)', 'MAE'], 4)} [{num(lo36, 5)}, {num(hi36, 4)}] & {v36}" + r" \\")
         put("SnapDiff", num(t36.loc["difference (without − with)", "MAE"], 4))
         put("SnapDiffCI", f"[{num(lo36, 5)}, {num(hi36, 4)}]")
 (OUT / "tab_ablation.tex").write_text(r"""\begin{table}[t]
 \centering
-\caption{Feature ablation (LightGBM, tuned settings, test 2024/25). $\Delta$MAE: change versus the full model with 95\%% paired player-level bootstrap CI; n.s.: CI contains 0. Snapshot attributes: position, sub-position, height and foot.}
+\caption{Feature ablation (LightGBM, tuned settings, test 2024/25). $\Delta$MAE is the change versus the full model with a 95\%% paired player-level bootstrap CI. ``n.s.'' means the CI contains 0. Snapshot attributes are position, sub-position, height and foot.}
 \label{tab:ablation}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \resizebox{\columnwidth}{!}{\begin{tabular}{lrcll}
 \toprule
-Variant & Feat. & MAE$_\Delta$ & $\Delta$MAE [95\%% CI] & \\
+Variant & Features & MAE$_\Delta$ & $\Delta$MAE [95\%% CI] & Effect \\
 \midrule
 %s
 \bottomrule
@@ -440,7 +440,7 @@ for y in f24.index:
                              f"{num(t25c.loc[y, 'skill vs best simple %'], 1)} {ci_str(t25c.loc[y, 'skill 95% CI'])}"]) + r" \\")
 (OUT / "tab_rolling.tex").write_text(r"""\begin{table}[t]
 \centering
-\caption{Rolling-origin evaluation: six test years, each with its own training and validation period (LightGBM with settings fixed in advance). Skill with 95\%% player-level bootstrap CI.}
+\caption{Rolling-origin evaluation over six test years, each with its own training and validation period (LightGBM with settings fixed in advance). Skill is shown with a 95\%% player-level bootstrap CI.}
 \label{tab:rolling}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}

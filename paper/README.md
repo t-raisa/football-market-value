@@ -30,5 +30,5 @@ cd paper && ~/miniforge3/envs/football/bin/tectonic main.tex && ~/miniforge3/env
 
 ## Still to do before submission
 
-- The code link points to https://github.com/t-raisa/football-market-value, which is public (MIT license). If the venue is double-blind, replace it with an anonymous link for review.
+- The PDFs are anonymous for double-blind review. `anonymous.tex` hides the author block and the GitHub link (https://github.com/t-raisa/football-market-value, public, MIT license) in both `main.tex` and `supplement.tex`. For the camera-ready version, change `\anonymoustrue` to `\anonymousfalse` in `anonymous.tex` and recompile.
 - The main paper is 6 pages including references. Check the venue's exact limit (some count references separately).

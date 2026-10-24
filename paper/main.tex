@@ -14,23 +14,28 @@
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 
 \input{generated/numbers}
+\input{anonymous}       % double-blind switch
 \raggedbottom            % avoid stretched gaps between paragraphs
 
 \begin{document}
 
-\title{Forecasting Football Player Market Values from Public Transfermarkt Data: A Time-Aware, Explainable Machine Learning Study}
+\title{Forecasting Football Player Market Values One Year Ahead: A Leak-Checked Public Benchmark}
 
+\ifanonymous
+\author{}                % no author block in the submission version
+\else
 \author{\IEEEauthorblockN{Tasnim Nahar Raisa}
 \IEEEauthorblockA{\textit{Department of Computer Science and Engineering} \\
 \textit{International Islamic University Chittagong}\\
 Chittagong, Bangladesh \\
 tasnimraisa24@gmail.com}
 }
+\fi
 
 \maketitle
 
 \begin{abstract}
-We present a free, leak-checked and fully reproducible benchmark for forecasting a football player's Transfermarkt market value 12 months ahead, built from a public Kaggle dataset and evaluated with a strict time split. An audit shows that several columns of the public data silently leak future information; all \NFeatures{} features are verified to use only information available at the valuation date. A simple age $\times$ value curve already removes \SkillCurve\% of the error of a no-change forecast. Gradient-boosted trees add a consistent gain on top of this curve: \VsCurveLGB\% \VsCurveLGBCI{} in 2024/25 and \RollVsCurveMin--\RollVsCurveMax\% in each of six test years. The gain is largest for players under 21 and for falls in value. Random 80/20 splits overstate accuracy, mainly because the same players appear in training and test. Calibrated 80\% forecast intervals reach \IntCovCal\% coverage. Against actual transfer fees, the forecasts beat the age $\times$ value curve but not clearly age alone. One script rebuilds every result from checksummed raw data.
+This paper sets up a free benchmark for predicting where a footballer's Transfermarkt market value will be 12 months later. Everything is built from a public Kaggle dataset and can be rerun from scratch. While preparing the data we found that some of its columns carry information from the future, so each of the \NFeatures{} features was tested to confirm it uses only data known on the valuation date. We split strictly by time. Under that split, an age $\times$ value lookup curve cuts the error of a no-change forecast by \SkillCurve\%. Gradient-boosted trees do better than the curve in all six test years we checked (\RollVsCurveMin{} to \RollVsCurveMax\% with fixed settings, and \VsCurveLGB\% \VsCurveLGBCI{} in 2024/25 after tuning). Most of their extra gain comes from players younger than 21 and from players whose value drops. If the data are split 80/20 at random instead, accuracy looks higher than it really is, largely because one player's records then sit in both training and test. After calibration, our 80\% forecast intervals contain the true value \IntCovCal\% of the time. On real transfer fees the forecasts beat the curve, but age by itself does about as well. A single script rebuilds all results from raw data with known checksums.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -40,45 +45,47 @@ football analytics, market value, forecasting, benchmark, data leakage, time ser
 % =============================================================================
 \section{Introduction}
 
-Transfermarkt publishes market values for tens of thousands of professional footballers. The values are set by an online community, track actual transfer fees closely~\cite{herm2014crowd}, and have become the standard target for data-driven player valuation~\cite{mueller2017beyond}. Clubs, however, need to know how a value is likely to \emph{develop}, for example when deciding whether to extend a contract or sell a player now.
+Transfermarkt publishes market values for tens of thousands of professional footballers. An online community sets these values. They are strongly related to actual transfer fees, although they are not unbiased predictors of them~\cite{coates2022wisdom}, and they have become the standard target for data-driven player valuation~\cite{mueller2017beyond,franceschi2024determinants}. What a club often needs, though, is a sense of where a value is heading. That question comes up when deciding whether to extend a contract or sell a player now.
 
-Most machine-learning studies estimate the current value or a transfer fee from attributes measured at the same time~\cite{mueller2017beyond,yigit2020xgboost,behravan2021novel,alasadi2022predict,aydemir2022ensembling,mchale2023estimating,huang2023explainable}. A recent study forecasts future development, but with data that is not public~\cite{vanarem2025forecasting}. Three issues make results in this area hard to compare and easy to overstate. Random splits place the same player, and later periods, in both training and test data. Public datasets store current attributes next to historical observations, which can leak future information~\cite{kaufman2012leakage,kapoor2023leakage}. And models are rarely compared with strong simple baselines or reported with confidence intervals.
+Most machine learning studies estimate the current value or a transfer fee from attributes measured at the same time~\cite{mueller2017beyond,yigit2020xgboost,behravan2021novel,alasadi2022predict,aydemir2022ensembling,mchale2023estimating,huang2023explainable,tamim2025machine,fotache2026machine,wang2026predicting,li2026interpretable}. Only two recent studies forecast future values~\cite{baouan2025what,vanarem2025forecasting}, and one of them uses data that is not public. Results in this area are also hard to compare and easy to overstate, for three reasons. Random splits put the same player, and later time periods, in both training and test data. Public datasets store current attributes next to historical observations, which can leak future information~\cite{kapoor2023leakage}. And models are rarely compared with strong simple baselines or reported with confidence intervals.
 
-This paper does not propose a new method. Its contributions are a reproducible public benchmark and a careful time-aware evaluation:
-\begin{enumerate}
-\item a 12-month forecasting benchmark built from the free Kaggle Transfermarkt dataset~\cite{kaggle_transfermarkt}, with a leakage audit of the public data, a cut-the-future test of every feature, and one script that rebuilds all results from checksummed raw data;
-\item an evaluation with a strict time split and embargo, strong simple baselines, six rolling test years, player-level bootstrap intervals, and a measurement of how much random splits overstate accuracy;
-\item an analysis of where machine learning adds value beyond an age $\times$ value curve, with calibrated forecast intervals, explanations, and a check against actual transfer fees.
-\end{enumerate}
+This paper does not propose a new method. We build a 12-month forecasting benchmark from the free Kaggle Transfermarkt dataset~\cite{kaggle_transfermarkt} and audit the public data for leakage. Each feature was put through a cut-the-future test, and all results can be rebuilt from checksummed raw data with one script. For evaluation we hold out data by time, leave an embargo gap, compare against strong simple baselines, repeat the test over six rolling years and attach player-level bootstrap intervals to the numbers. We also put a figure on how far random splits inflate accuracy. The last part asks where machine learning actually beats an age $\times$ value curve. Here we look at calibrated forecast intervals, SHAP explanations and real transfer fees.
 
 % =============================================================================
 \section{Related Work}
 
-Herm et al.~\cite{herm2014crowd} showed that Transfermarkt community values predict transfer fees well. M\"uller et al.~\cite{mueller2017beyond} estimated these values with multilevel regression for 4,217 players from the top five European leagues over six seasons.
+Most machine learning work in team sports has gone into predicting match results~\cite{bunker2022application}. Player valuation has its own literature. Franceschi et al.~\cite{franceschi2024determinants} survey the factors that economists have linked to player value. Coates and Parshakov~\cite{coates2022wisdom} compared Transfermarkt's crowd estimates with real fees and found them useful, though biased. An early data-driven attempt came from M\"uller et al.~\cite{mueller2017beyond}, who fitted a multilevel regression to 4,217 players across six seasons of the five biggest European leagues.
 
-Later studies used video-game and simulation data. Yigit et al.~\cite{yigit2020xgboost} combined XGBoost and lasso on Football Manager attributes of 5,316 players from 11 leagues, and Behravan and Razavi~\cite{behravan2021novel} clustered FIFA~20 players by position and fitted particle-swarm-optimised support vector regression per cluster. Al-Asadi and Ta\c{s}demir~\cite{alasadi2022predict} found random forest best on FIFA~20 attributes, and Huang and Zhang~\cite{huang2023explainable} explained tree ensembles on about 12,000 sofifa players with SHAP.
+Several later studies relied on video game and simulation data. Yigit et al.~\cite{yigit2020xgboost} combined XGBoost and lasso on Football Manager attributes of 5,316 players from 11 leagues. Behravan and Razavi~\cite{behravan2021novel} clustered FIFA~20 players by position and fitted a support vector regression, tuned with particle swarm optimisation, for each cluster. On FIFA~20 attributes, Al-Asadi and Ta\c{s}demir~\cite{alasadi2022predict} found that random forest worked best, and Huang and Zhang~\cite{huang2023explainable} used SHAP to explain tree ensembles trained on about 12,000 sofifa players.
 
-For transfer fees, Aydemir et al.~\cite{aydemir2022ensembling} stacked LightGBM models on performance, popularity and transfer data. McHale and Holmes~\cite{mchale2023estimating} showed that advanced performance metrics and XGBoost improve predictions, with the buying club's spending a strong predictor. Closest to our question, van Arem et al.~\cite{vanarem2025forecasting} forecast the future development of quality and value with a time-based evaluation on non-public data.
+Transfer fees have been modelled too. Aydemir et al.~\cite{aydemir2022ensembling} stacked LightGBM models on performance, popularity and transfer data. McHale and Holmes~\cite{mchale2023estimating} showed that advanced performance metrics and XGBoost improve fee predictions, and that the buying club's spending is a strong predictor. Poli et al.~\cite{poli2024statistical} used linear regression on more than 8,000 fees worldwide, while Li et al.~\cite{li2026interpretable} compared four models on about 800 Big-Five fees and explained them with SHAP.
 
-Table~\ref{tab:related} summarises these studies. All but one estimate a current value or fee. Our work studies forecasting with public data, and its focus is the evaluation itself: leakage, baselines, time splits and uncertainty.
+Newer value models work with larger datasets. Tamim et al.~\cite{tamim2025machine} found random forest best on FIFA~22 attributes of more than 16,000 players, and Khalife et al.~\cite{khalife2025dynamic} fitted gradient boosting separately by age group and position. Fotache et al.~\cite{fotache2026machine} used about 14,000 player-seasons from FBref and Transfermarkt, where gradient boosting and neural networks performed best. Wang et al.~\cite{wang2026predicting} stacked gradient boosting models with an attention LSTM for 18,547 players of the top five leagues, and Zar\k{e}ba et al.~\cite{zareba2025decoding} valued defenders from event-based metrics with XGBoost and neural networks. A number of these studies evaluate with random splits or $k$-fold cross-validation~\cite{tamim2025machine,khalife2025dynamic,wang2026predicting}.
+
+Two studies are closest to our question. Baouan et al.~\cite{baouan2025what} used lasso and random forests to select features that forecast future Transfermarkt values for each position. Van Arem et al.~\cite{vanarem2025forecasting} forecast how quality and value develop over time, with a time-based evaluation on non-public data.
 
 \begin{table}[t]
 \centering
-\caption{Closest related studies. ``Current'': value or fee at the time of measurement; ``future'': value at a later date.}
+\caption{Closest related studies. ``Current'' means the value or fee at the time of measurement. ``Future'' means the value at a later date.}
 \label{tab:related}
 \footnotesize
-\setlength{\tabcolsep}{2.5pt}
+\setlength{\tabcolsep}{2.3pt}
 \begin{tabular}{@{}llll@{}}
 \toprule
 Study & Data & Target & Main model \\
 \midrule
-\cite{mueller2017beyond} & Transfermarkt, top-5 leagues & current value & multilevel regr. \\
+\cite{mueller2017beyond} & Transfermarkt, top-5 leagues & current value & multilevel regression \\
 \cite{yigit2020xgboost} & Football Manager (game) & current value & XGBoost + lasso \\
 \cite{behravan2021novel} & FIFA 20 & current value & PSO-SVR \\
 \cite{alasadi2022predict} & FIFA 20 (sofifa) & current value & random forest \\
 \cite{aydemir2022ensembling} & performance, popularity & transfer fee & LightGBM stacking \\
 \cite{mchale2023estimating} & advanced metrics & transfer fee & XGBoost \\
 \cite{huang2023explainable} & sofifa, $\sim$12k players & current value & GBDT + SHAP \\
+\cite{tamim2025machine} & FIFA 22, $>$16k players & current value & random forest \\
+\cite{li2026interpretable} & $\sim$800 Big-Five fees & transfer fee & 4 models + SHAP \\
+\cite{fotache2026machine} & FBref + Transfermarkt & current value & GBDT, neural net \\
+\cite{wang2026predicting} & top-5 leagues, 18.5k & current value & GBDT/LSTM stack \\
+\cite{baouan2025what} & Transfermarkt, by position & future value & lasso, RF \\
 \cite{vanarem2025forecasting} & non-public data & future value & explainable ML \\
 \midrule
 Ours & public Transfermarkt (Kaggle) & value in 12 mo. & baselines, GBDT \\
@@ -86,115 +93,128 @@ Ours & public Transfermarkt (Kaggle) & value in 12 mo. & baselines, GBDT \\
 \end{tabular}
 \end{table}
 
+Table~\ref{tab:related} lists the closest studies. All but two of them estimate a current value or fee. We study forecasting with public data, and our main interest is the evaluation itself, meaning leakage, baselines, time splits and uncertainty.
+
 % =============================================================================
 \section{Data}
 
-\subsection{Source and leakage audit}\label{sec:audit}
-We use the Kaggle dataset ``Football Data from Transfermarkt''~\cite{kaggle_transfermarkt}, version with files dated 5 September 2026, identified by SHA-256 checksums. It contains \NRawPlayers{} players, \NRawValuations{} market valuations, \NRawAppearances{} match appearances (from July 2012) and \NRawTransfers{} transfers, \NTransfersFee{} of them with a recorded fee. The audit found three problems.
-\begin{enumerate}
-\item \emph{Snapshot attributes.} Contract end dates and international caps are 2026 values. For \PctContractFuture\% of valuations with a known contract, the stored contract ends more than five years later, so it could not have existed at the time. Both columns are excluded.
-\item \emph{Club of historical valuations.} Of the \NValRowsLeakPeriod{} valuations from July 2014 on, \NValRowsNoTransfer{} have no earlier transfer record, and for \PctNoTransferIsToday\% of these the valuation's club field holds the player's \emph{2026} club. We therefore rebuild the club at $t$ from the latest transfer or appearance on or before $t$, and the league from that club's latest league match.
-\item \emph{Uneven coverage.} Match data cover \NCoreLeagues{} European first divisions from 2012/13 (\CoreLeagueList); \NNewLeagues{} further leagues appear only from 2024/25. We fixed the \NCoreLeagues{} \emph{core leagues} before any modelling, using coverage only, and keep the others as an extra test set.
-\end{enumerate}
+\subsection{Source and Leakage Audit}\label{sec:audit}
+We use the Kaggle dataset ``Football Data from Transfermarkt''~\cite{kaggle_transfermarkt}, in the version with files dated 5 September 2026, identified by SHA-256 checksums. It covers \NRawPlayers{} players, \NRawValuations{} market valuations, \NRawAppearances{} match appearances from July 2012 onward and \NRawTransfers{} transfers, of which \NTransfersFee{} have a recorded fee. The audit turned up three problems.
 
-Transfermarkt also rounds values, so \PctTies\% of no-change test errors are \emph{exactly} 20\%. The ``within $\pm$20\%'' metric therefore needs a tie rule (Section~\ref{sec:metrics}).
+The first is snapshot attributes. Contract end dates and international caps are stored as they stood in 2026. For \PctContractFuture\% of valuations with a known contract, the stored contract ends more than five years later, which means it could not have existed at that time. Neither column is used.
 
-\subsection{Observations, target and features}
-An observation is a player at a valuation date $t$, from July 2014 on: match data start in 2012 and the longest feature window is 730 days. The target is the log of the valuation closest to $t+365$ days, accepted within $\pm$60 days. This gives \NRows{} observations of \NPlayers{} players, \NCoreRows{} of them in the core leagues. Expensive players are kept.
+The second concerns the club attached to historical valuations. Of the \NValRowsLeakPeriod{} valuations from July 2014 onward, \NValRowsNoTransfer{} have no earlier transfer record, and in every one of these cases the club field holds the player's 2026 club. We therefore rebuild the club at $t$ from the latest transfer or appearance on or before $t$. The league comes from that club's latest league match.
 
-The \NFeatures{} features cover the player (age, height, foot, position, foreign status), the value history (current value, values 6 and 12 months earlier, growth, maximum so far), performance in the previous 365 days (minutes, goals and assists per 90, cards, league vs.\ other competitions), the player's own transfers, and the club and league at $t$ (club transfer spending, results, squad value, value relative to club and league). Every feature uses only records dated on or before $t$. A cut-the-future test confirms this: we delete all records after a cutoff, rebuild the features, and require every feature of earlier observations to be unchanged. All \NLeakPassed{} feature--cutoff checks pass, while a deliberately leaky control feature fails.
+The third is uneven coverage. Match data cover \NCoreLeagues{} European first divisions from 2012/13 (\CoreLeagueList), while \NNewLeagues{} more leagues appear only from 2024/25. We fixed these \NCoreLeagues{} core leagues before any modelling, based only on coverage, and kept the other leagues as an extra test set.
 
-Observations without a valuation 10--14 months later are dropped. In the core-league test period this affects \DropRateTest\% of the observations whose window lies fully inside the data (\DropTest{} of \DropTestComplete). We return to this in Section~\ref{sec:limits}.
+Transfermarkt also rounds its values. As a result, \PctTies\% of no-change test errors are exactly 20\%, so the ``within $\pm$20\%'' metric needs a rule for ties (Section~\ref{sec:metrics}).
+
+\subsection{Observations, Target and Features}
+Each observation is a player at a valuation date $t$ from July 2014 on. This start date leaves room for the longest feature window of 730 days, since match data begin in 2012. The target is the log of the valuation closest to $t+365$ days, accepted if it falls within $\pm$60 days. The result is \NRows{} observations of \NPlayers{} players, with \NCoreRows{} of them in the core leagues. Expensive players are kept.
+
+The \NFeatures{} features describe the player (age, height, foot, position, foreign status) and the value history (current value, values 6 and 12 months earlier, growth, maximum so far). They also cover performance over the previous 365 days, such as minutes, goals and assists per 90, cards, and league versus other competitions. The rest describe the player's own transfers and the club and league at $t$, including club transfer spending, results, squad value and the player's value relative to club and league.
+
+Every feature uses only records dated on or before $t$. A cut-the-future test confirms this. We delete all records after a cutoff, rebuild the features and require that no feature of an earlier observation changes. A deliberately leaky control feature fails this test, while all \NLeakPassed{} checks on the real features pass.
+
+We drop any observation that lacks a valuation between 10 and 14 months later. Within the core-league test period, \DropTest{} of the \DropTestComplete{} observations with a complete target window were lost this way (\DropRateTest\%). Section~\ref{sec:limits} discusses how this could bias the results.
 
 % =============================================================================
 \section{Method}
 
-\subsection{Time-based split}
-Training uses valuation dates before July 2023, validation July 2023 to June 2024, and test July 2024 onward (\NTest{} core-league observations of \NTestPlayers{} players). Training targets must be dated before the test period. Settings are tuned on the \NTune{} training observations whose targets precede the validation year (an embargo) and scored on the validation year; the chosen settings are then refit on all \NTrain{} training observations. Validation observations are never used for a final fit, because their targets fall in the test period. For comparison only, we also use random 80/20 splits of observations and of players.
+\subsection{Time-Based Split}
+Data before July 2023 are used for training. The year from July 2023 to June 2024 is the validation year, and everything from July 2024 on is the test set (\NTest{} core-league observations, \NTestPlayers{} players). No training target may fall inside the test period. Tuning works on a reduced training set of \NTune{} observations, namely those whose targets are dated before the validation year starts. This gap serves as an embargo. Each candidate setting is scored on the validation year, and the winner is refit on all \NTrain{} training observations. We never use validation observations in a final model, since their targets lie in the test period. Random 80/20 splits of observations and of players are used only for comparison.
 
-\subsection{Baselines and models}
-All models predict the 12-month log change $y-\log v_t$. The simple baselines are:
-\begin{itemize}
-\item no change;
-\item the \emph{age $\times$ value curve}: the mean training change in each cell of six age groups ($<$21, 21--23, 24--26, 27--29, 30--32, 33+) by five value quintiles;
-\item the same curve by league;
-\item momentum: the last observed change continued over 12 months, at full or half strength.
-\end{itemize}
-The mean (vs.\ the median) and the best simple baseline were chosen on the validation year. The age $\times$ value curve won and serves as the second reference throughout.
+\subsection{Baselines and Models}
+All models predict the 12-month log change, $y-\log v_t$. The simple baselines are no change, the age $\times$ value curve, the same curve by league, and momentum. The age $\times$ value curve is the mean training change in each cell formed by six age groups ($<$21, 21--23, 24--26, 27--29, 30--32, 33+) and five value quintiles. Momentum continues the last observed change over 12 months, at full or at half strength. The choice between mean and median, and the choice of the best simple baseline, were both made on the validation year. The age $\times$ value curve won and serves as the second reference throughout the paper.
 
-The learned models are ridge regression, random forest~\cite{breiman2001random}, XGBoost~\cite{chen2016xgboost}, LightGBM~\cite{ke2017lightgbm} and CatBoost~\cite{prokhorenkova2018catboost}, lightly tuned (6--15 settings per model plus early stopping). As a small check of sequence models, a GRU~\cite{cho2014gru} reads the last ten valuations together with the tabular features; we report the mean of three seeds.
+The learned models are ridge regression, random forest~\cite{breiman2001random}, XGBoost~\cite{chen2016xgboost}, LightGBM~\cite{ke2017lightgbm} and CatBoost~\cite{prokhorenkova2018catboost}. Tuning was light, with between 6 and 15 settings per model and early stopping. We also tried a GRU~\cite{cho2014gru} as a quick test of sequence models. It takes the last ten valuations plus the tabular features, and the number we report is its average over three random seeds.
 
-For forecast intervals, LightGBM quantile models predict the 10th, 50th and 90th percentiles. The 80\% intervals are calibrated with conformalized quantile regression, separately for each age group. The \NCalRows{} calibration observations are training observations whose targets fall between July 2023 and June 2024: all are dated before the test period, and none was seen by the calibrated model.
+To get forecast intervals we train LightGBM quantile models for the 10th, 50th and 90th percentiles. Conformalized quantile regression~\cite{romano2019conformalized} then calibrates the 80\% intervals, with a separate correction for each age group. Calibration uses \NCalRows{} training observations whose targets fall between July 2023 and June 2024. All of them are dated before the test period, and the calibrated model never saw any of them.
 
-\subsection{Metrics and uncertainty}\label{sec:metrics}
-The main error measure, MAE$_\Delta$, is the mean absolute error of the 12-month log change. \emph{Skill} is the share of a reference's MAE$_\Delta$ that a model removes, against no change and against the age $\times$ value curve. Ranking quality is measured by Spearman's $\rho$ and by top-10\% precision: of the 10\% largest predicted rises (falls), the share that truly rose (fell). The main euro metric is the median absolute percentage error (MdAPE); the share within $\pm$20\% is secondary, with errors of exactly 20\% counted as within. Intervals are scored by coverage, width and pinball loss. All confidence intervals come from a player-level bootstrap~\cite{field2007bootstrapping} with 1,000 draws, paired across models; when the 95\% interval of a difference contains zero, we report ``no clear difference''.
+\subsection{Metrics and Uncertainty}\label{sec:metrics}
+Our main error measure, MAE$_\Delta$, is the mean absolute error of the 12-month log change. Skill is the share of a reference model's MAE$_\Delta$ that a model removes, and we report it against both no change and the age $\times$ value curve. Ranking quality is measured with Spearman's $\rho$ and with top-10\% precision, which asks how many of the 10\% largest predicted rises actually rose (and the same for falls).
+
+For values in euros we mainly report the median absolute percentage error (MdAPE). The share of forecasts within $\pm$20\% comes second, and an error of exactly 20\% is counted as inside. Intervals are judged on coverage, width and pinball loss. Confidence intervals throughout come from a player-level (pairs cluster) bootstrap~\cite{mackinnon2023cluster} with 1,000 draws, and the same draws are used for every model so that differences are paired. When the 95\% interval of a difference contains zero, we call it ``no clear difference''.
 
 % =============================================================================
 \section{Results}
 
 \input{generated/tab_results}
 
-\subsection{Main comparison}
-Table~\ref{tab:results} shows the core-league test results. The age $\times$ value curve alone removes \SkillCurve\% \SkillCurveCI{} of the no-change error; adding the league does not help (\VsCurveLeagueCurve\% \VsCurveLeagueCurveCI), and momentum is worse than no change (\SkillMomentum\%). Every learned model beats the curve. LightGBM removes \VsCurveLGB\% \VsCurveLGBCI{} of the curve's error (MAE$_\Delta$ \MAELGB{} vs.\ \MAECurve) and lowers the MdAPE from \MdAPECurve\% to \MdAPELGB\%. LightGBM, CatBoost and XGBoost are statistically tied (e.g.\ LightGBM $-$ CatBoost \DiffLGBCat{} \DiffLGBCatCI), while ridge (\VsCurveRidge\%) and random forest (\VsCurveRF\%) gain less. The GRU, a small check of sequence models, is slightly but clearly worse than LightGBM (\DiffLGBGRU{} \DiffLGBGRUCI).
+\subsection{Main Comparison}
+Table~\ref{tab:results} gives the core-league test results. On its own, the age $\times$ value curve removes \SkillCurve\% \SkillCurveCI{} of the no-change error. Adding the league does not help (\VsCurveLeagueCurve\% \VsCurveLeagueCurveCI), and momentum does worse than no change at all (\SkillMomentum\%).
 
-These numbers are conservative. On the \FullWinRows{} test observations whose whole target window lies inside the data, LightGBM's skill over the curve is \FullWinVsCurve\% \FullWinVsCurveCI. The remaining test observations were kept only because their next valuation came early, and they are harder.
+Every learned model beats the curve. LightGBM removes \VsCurveLGB\% \VsCurveLGBCI{} of the curve's error (MAE$_\Delta$ \MAELGB{} vs.\ \MAECurve) and lowers the MdAPE from \MdAPECurve\% to \MdAPELGB\%. LightGBM, CatBoost and XGBoost are statistically tied, with LightGBM $-$ CatBoost at \DiffLGBCat{} \DiffLGBCatCI, for example. The GRU is slightly but clearly worse than LightGBM (\DiffLGBGRU{} \DiffLGBGRUCI). That fits benchmarks in which tree ensembles beat deep networks on tabular data~\cite{grinsztajn2022why,shwartzziv2022tabular}.
 
-\subsection{Random splits overstate accuracy}
-Table~\ref{tab:splits} trains the same LightGBM model under three splits. A random split of observations raises the skill over no change from \SplitSkillTime\% to \SplitSkillRows\% (difference \SplitDiffRowsTime{} points, CI \SplitDiffRowsTimeCI), while a random split of \emph{players} does not (\SplitSkillPlayers\%; difference \SplitDiffPlayersTime, CI \SplitDiffPlayersTimeCI). The overstatement therefore comes from repeated players: \LeakLater\% of random-split test observations have a later observation of the same player in training.
+These numbers are on the conservative side. If we keep only the \FullWinRows{} test observations with a complete target window, LightGBM's skill over the curve goes up to \FullWinVsCurve\% \FullWinVsCurveCI. The rest of the test set is there only because the next valuation arrived early, and those cases are harder.
+
+\subsection{Random Splits Overstate Accuracy}
+In Table~\ref{tab:splits} one LightGBM model is trained under three splits. With a random split of observations, skill over no change goes from \SplitSkillTime\% to \SplitSkillRows\%. That is \SplitDiffRowsTime{} points higher (CI \SplitDiffRowsTimeCI). A random split by player gives \SplitSkillPlayers\%, only \SplitDiffPlayersTime{} points above the time split (CI \SplitDiffPlayersTimeCI), which is within noise. The extra accuracy therefore comes from seeing the same player twice. In the random row split, \LeakLater\% of test rows have a later row of that same player in training.
 
 \input{generated/tab_splits}
 
-\subsection{Six test years}
-Table~\ref{tab:rolling} repeats the design with test years 2019/20 to 2024/25~\cite{tashman2000out}. Each year has its own validation year and embargo, and LightGBM settings are fixed in advance. LightGBM beats the age $\times$ value curve in all \RollVsCurveWins{} years, by \RollVsCurveMin\% to \RollVsCurveMax\% (mean \RollVsCurveMean\%), and beats no change by \RollSkillMin--\RollSkillMax\% (mean \RollSkillMean\%); the curve itself removes \RollCurveMin--\RollCurveMax\% of the no-change error. The gain over the curve is smallest in 2019/20, when COVID-19 cut values in spring 2020.
+\subsection{Six Test Years}
+In Table~\ref{tab:rolling} the whole design is rerun six times, once for each test year from 2019/20 to 2024/25, always keeping the time order~\cite{cerqueira2020evaluating}. Every year has its own validation year and embargo. LightGBM settings were fixed beforehand and not retuned, so the 2024/25 row is a little different from the tuned results in Table~\ref{tab:results}.
+
+The trees beat the age $\times$ value curve every year. The margin ranges from \RollVsCurveMin\% to \RollVsCurveMax\%, with a mean of \RollVsCurveMean\%. 2019/20 has the smallest gain over the curve. That season includes spring 2020, when COVID-19 brought values down across the board.
 
 \input{generated/tab_rolling}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.78\textwidth]{fig07_gain_by_group.png}
+\includegraphics[width=0.72\textwidth]{fig07_gain_by_group.png}
 \caption{LightGBM skill by group (test 2024/25, core leagues), measured against the no-change forecast (blue) and against the age $\times$ value curve (orange), with 95\% player-level bootstrap intervals. Bottom right: MAE of all three by size of the realised change (descriptive).}
 \label{fig:groups}
 \end{figure*}
 
-\subsection{Where does machine learning help?}
-Fig.~\ref{fig:groups} compares LightGBM with both references within groups. Against no change, the gain looks largest for players aged 30+ (\GrpVsNaiveC\%). This is almost entirely the routine decline that the curve already predicts: against the curve, the gain for 30+ is only \GrpVsCurveC\% \GrpVsCurveCCI. Machine learning adds most for players \emph{under 21} (\GrpVsCurveU\% \GrpVsCurveUCI) and for falls (\GrpVsCurveModFall\% for falls of 10--33\%, \GrpVsCurveBigFall\% for larger falls). It is \emph{worse} than the curve on moderate rises of 10--50\% (\GrpVsCurveModRise\% \GrpVsCurveModRiseCI). Gains are similar across positions (\GrpPosVsCurveMin--\GrpPosVsCurveMax\%) and value levels.
+\subsection{Where Does Machine Learning Help?}
+Fig.~\ref{fig:groups} compares LightGBM with both references inside groups of players. Measured against no change, the gain looks largest for players aged 30 and over (\GrpVsNaiveC\%). Almost all of this is the routine decline that the curve already predicts. Against the curve, the gain for this group shrinks to \GrpVsCurveC\% \GrpVsCurveCCI.
 
-Across the core leagues, the gain over the curve is clearly positive in \CoreLgPosCount{} of \NCoreLeagues{} and negative in \CoreLgNeg. In the \NNewLeagues{} leagues never seen in training, LightGBM adds little beyond the curve: \NewVsCurve\% \NewVsCurveCI{} overall, clearly positive in only \NewLgPosCount{} leagues. Only \NewWindowCov\% of their 365-day performance window is covered by match data, yet dropping the performance features makes things worse (\NewNoPerfVsCurve\%).
+Machine learning helps most for players under 21 (\GrpVsCurveU\% \GrpVsCurveUCI) and for falls in value, with \GrpVsCurveModFall\% for falls of 10 to 33\% and \GrpVsCurveBigFall\% for larger falls. On moderate rises of 10 to 50\% it is worse than the curve (\GrpVsCurveModRise\% \GrpVsCurveModRiseCI). Gains are similar across positions (\GrpPosVsCurveMin--\GrpPosVsCurveMax\%) and value levels.
 
-\textbf{Ranking.} The model also ranks players better than age alone. Of its 10\% largest predicted rises, \RankRiseLGB\% truly rose, against \RankRiseYoung\% for the youngest 10\% of players (+\RankRiseDiff{} points, CI \RankRiseDiffCI). Of its 10\% largest predicted falls, \RankFallLGB\% truly fell, against \RankFallOld\% for the oldest 10\% (+\RankFallDiff{} points, CI \RankFallDiffCI).
+Across the \NCoreLeagues{} core leagues, the gain over the curve is clearly positive in \CoreLgPosCount{} and negative in \CoreLgNeg. In the \NNewLeagues{} leagues never seen in training, LightGBM adds little beyond the curve, \NewVsCurve\% \NewVsCurveCI{} overall, and it is clearly positive in only \NewLgPosCount{} of them. Match data cover only \NewWindowCov\% of the 365-day performance window in these leagues. Even so, dropping the performance features makes the results worse (\NewNoPerfVsCurve\%).
 
-\textbf{Forecast intervals.} Uncalibrated LightGBM quantile intervals cover \IntCovRaw\% \IntCovRawCI{} of true values instead of 80\%. After calibration by age group, coverage is \IntCovCal\% \IntCovCalCI. The intervals are \IntWidthIncrease\% wider (median width \IntWidthCal\% of the value at $t$), and the mean pinball loss is \IntPinballCal, against \IntPinballRef{} for intervals from the age $\times$ value percentiles. Under-21s remain slightly under-covered (\IntCovCalU\% \IntCovCalUCI). For players aged 30+ coverage is correct (\IntCovCalC\%), but the misses are lopsided: \IntBelowC\% of true values fall below the interval and \IntAboveC\% above it.
+\textit{Ranking.} The model also ranks players better than age does. Of its 10\% largest predicted rises, \RankRiseLGB\% actually rose, compared with \RankRiseYoung\% for the youngest 10\% of players (+\RankRiseDiff{} points, CI \RankRiseDiffCI). Of its 10\% largest predicted falls, \RankFallLGB\% actually fell, compared with \RankFallOld\% for the oldest 10\% (+\RankFallDiff{} points, CI \RankFallDiffCI).
 
-\begin{figure*}[t]
+\textit{Forecast intervals.} Before calibration, LightGBM quantile intervals cover \IntCovRaw\% \IntCovRawCI{} of true values instead of the target 80\%. Calibrating by age group brings coverage to \IntCovCal\% \IntCovCalCI. The intervals become \IntWidthIncrease\% wider, with a median width of \IntWidthCal\% of the value at $t$, and the mean pinball loss is \IntPinballCal, against \IntPinballRef{} for intervals built from the age $\times$ value percentiles. Under-21s are still slightly under-covered (\IntCovCalU\% \IntCovCalUCI). For players aged 30 and over, coverage is right at \IntCovCalC\%, but the misses lean one way. In \IntBelowC\% of cases the true value falls below the interval, and in only \IntAboveC\% above it.
+
+\begin{figure}[t]
 \centering
-\includegraphics[width=0.62\textwidth]{fig09_shap_beeswarm.png}
+\includegraphics[width=0.92\columnwidth]{fig09_shap_beeswarm.png}
 \caption{SHAP values of the 15 most important features (LightGBM, 3,000 test observations). Each dot is one observation; colour shows the feature value. Positive values push the forecast towards a rise.}
 \label{fig:shap}
-\end{figure*}
+\end{figure}
 
-\subsection{Explanations and ablations}
-TreeSHAP~\cite{lundberg2017unified,lundberg2020trees} on 3,000 test observations (Fig.~\ref{fig:shap}) ranks \ShapTopFive{} highest. Age lowers the forecast steeply after about 28; recent increases continue; players valued above their league or club median grow less; and long absences from matches predict falls.
+\subsection{Explanations and Ablations}
+We ran TreeSHAP~\cite{lundberg2017unified,lundberg2020trees} on 3,000 test observations (Fig.~\ref{fig:shap}). The top-ranked features are \ShapTopFive. Age pulls the forecast down steeply after about 28. Recent increases tend to continue. Players valued above their league or club median grow less, and long absences from matches point to a fall.
 
-Table~\ref{tab:ablation} shows how much accuracy each feature group adds. Removing value history hurts most (+\AblHist), followed by performance (+\AblPerf) and player attributes (+\AblPlayer). Neither the player's own transfer history nor the club's transfer spending and income adds accuracy (club finance: +\AblFin, n.s.; SHAP ranks these features \ShapFinRankMin--\ShapFinRankMax{} of \NFeatures). Club spending correlates strongly with squad value (Spearman \SpendTotalValueCorr), which the model already uses; McHale and Holmes~\cite{mchale2023estimating} found spending important when the target is the fee itself. The snapshot attributes (position, sub-position, height, foot) matter very little: removing them raises MAE$_\Delta$ by only \SnapDiff{} \SnapDiffCI.
+Table~\ref{tab:ablation} shows how much accuracy each group of features adds. Removing the value history hurts the most (+\AblHist), followed by performance (+\AblPerf) and player attributes (+\AblPlayer). Transfer features turned out to be of little use. Taking out the player's own transfer history, or the club's spending and income, changes the error by an amount we cannot tell apart from zero (club finance +\AblFin, n.s.), and in the SHAP ranking these features sit between \ShapFinRankMin{}rd and \ShapFinRankMax{}th out of \NFeatures. One reason is that club spending is strongly correlated with squad value (Spearman \SpendTotalValueCorr), which the model already uses. McHale and Holmes~\cite{mchale2023estimating} did find spending important, but their target was the fee itself. Position, sub-position, height and foot, the attributes taken from the 2026 snapshot, barely matter. Without them MAE$_\Delta$ goes up by \SnapDiff{} \SnapDiffCI.
 
 \input{generated/tab_ablation}
 
 % =============================================================================
 \section{Discussion}
-The target is Transfermarkt's own estimate, so part of what any model learns is how the community updates its values. Two results suggest that much of the predictable change is routine (regular markdowns for older players and markups for young ones): the age $\times$ value curve is a strong baseline, and the large gain for players aged 30+ disappears once age is in the baseline. What machine learning adds on top is smaller but consistent, mainly for young players and for players about to lose value.
+Because the target is a Transfermarkt estimate, a model partly learns the habits of the people who set those estimates. Two of our results point to a lot of the predictable movement being routine. Older players get marked down and young ones get marked up, year after year. That is why a plain age $\times$ value curve is so hard to beat, and why the big gain for players over 30 vanishes once the baseline knows their age. What machine learning adds on top is smaller but steady, and it shows up mainly for young players and for players about to lose value.
 
-To see whether this carries over to real money, we related the forecasts to actual fees for the \FeeN{} test observations whose player was sold within 12 months (\FeePlayers{} players). The Spearman correlation between the predicted change and $\log(\text{fee}/\text{value at }t)$ is \FeeRhoLGB{} \FeeRhoLGBCI{} for LightGBM and \FeeRhoCurve{} \FeeRhoCurveCI{} for the curve, so LightGBM is clearly better than the curve (difference \FeeRhoDiffCurve{} \FeeRhoDiffCurveCI). Age alone, however, reaches \FeeRhoAge{} \FeeRhoAgeCI, and LightGBM is \emph{not} clearly better than it (difference \FeeRhoDiffAge{} \FeeRhoDiffAgeCI). Even the true change of the Transfermarkt value correlates only \FeeRhoTrue{} with fees. Forecasting the community value is therefore useful but only partly informative about actual prices.
+To check whether this carries over to real money, we matched the forecasts against actual fees for the \FeeN{} test observations where the player was sold within 12 months (\FeePlayers{} players). The Spearman correlation between the predicted change and $\log(\text{fee}/\text{value at }t)$ is \FeeRhoLGB{} \FeeRhoLGBCI{} for LightGBM and \FeeRhoCurve{} \FeeRhoCurveCI{} for the curve, a clear difference of \FeeRhoDiffCurve{} \FeeRhoDiffCurveCI. Age alone, however, reaches \FeeRhoAge{} \FeeRhoAgeCI, and LightGBM is not clearly better than that (difference \FeeRhoDiffAge{} \FeeRhoDiffAgeCI). Even the true change in the Transfermarkt value correlates only \FeeRhoTrue{} with fees. Forecasting the community value is useful, then, but it tells only part of the story about real prices.
 
 \subsection{Limitations}\label{sec:limits}
-We forecast a community estimate, which is only partly related to transfer fees~\cite{herm2014crowd}. \DropRateTest\% of core-league test observations with a fully observable window have no valuation 10--14 months later. These drops are not mainly falls: within 18 months \DropFell\% fell and \DropRose\% rose, against \KeptFell\% and \KeptRose\% for kept observations. However, dropped players under 21 rose much less (median log change \DropYoungMedian{} vs.\ \KeptYoungMedian), so forecasts for young players who leave coverage may be too optimistic. Only \NCoreLeagues{} European leagues have match data for the whole period; in the \NNewLeagues{} other leagues, \NewZeroMin\% of test observations show zero minutes (core: \CoreZeroMin\%). There are no contract, wage or injury data, and position, height and foot come from the 2026 snapshot, with little effect on accuracy. The calibrated intervals still under-cover under-21s and miss older players mostly on the low side. Finally, the GRU is small and uses only valuation histories.
+We forecast a community estimate, which is only partly linked to transfer fees~\cite{coates2022wisdom}. Among core-league test observations with a fully observable window, \DropRateTest\% have no valuation 10 to 14 months later. These dropped cases are not mostly falls. Within 18 months, \DropFell\% of them fell and \DropRose\% rose, compared with \KeptFell\% and \KeptRose\% for the observations we kept. Dropped players under 21, however, rose much less (median log change \DropYoungMedian{} vs.\ \KeptYoungMedian), so forecasts for young players who leave coverage may be too optimistic.
+
+Match data for the full period exist for only \NCoreLeagues{} European leagues. In the other \NNewLeagues{} leagues, \NewZeroMin\% of test observations show zero minutes, against \CoreZeroMin\% in the core leagues. Contract, wage and injury data are missing altogether. Position, height and foot are taken from the 2026 snapshot, but removing them hardly changes accuracy. Even after calibration, intervals for under-21s are a bit too narrow, and for older players most misses are on the low side. Our GRU is small and sees only valuation histories, so it says little about what a stronger sequence model could do.
 
 \section{Conclusion}
-Public Transfermarkt data support a reproducible 12-month forecasting benchmark, provided that leaking snapshot columns are removed and the evaluation uses a strict time split. A simple age $\times$ value curve captures most of the predictable change. Gradient-boosted trees add a consistent \RollVsCurveMin--\RollVsCurveMax\% on top of it in every test year, mostly for young players and for falls, but little in leagues outside the training data. Random splits overstate accuracy through repeated players, and against actual fees the forecasts beat the curve but not age alone. We hope the benchmark makes such comparisons easy to repeat.
+Can public Transfermarkt data be used to benchmark value forecasts? Yes, but two repairs come first. The 2026 snapshot columns have to go, and each player's club history has to be rebuilt from transfers and appearances. The split must also follow time. Once that is done, age and current value explain most of what can be predicted a year out. Boosted trees still improved on them in each of the six seasons, mostly for under-21s and for players heading for a drop, but much less in leagues they were not trained on. We would next like to add contract and injury records, which the Kaggle data do not have, and to check the forecasts against real fees instead of the community estimate alone.
 
 \section*{Data and Code Availability}
-The data are the public Kaggle dataset~\cite{kaggle_transfermarkt}; SHA-256 checksums identify the exact version. One script checks the data version and rebuilds all \NResultTables{} result tables and \NFigures{} figures. The code is available at \url{https://github.com/t-raisa/football-market-value}.
+All data come from the public Kaggle dataset~\cite{kaggle_transfermarkt}, and the exact version can be checked with its SHA-256 checksums. One script verifies the version and regenerates the \NResultTables{} result tables and \NFigures{} figures. \ifanonymous
+To keep the review anonymous we do not give the code link here. It will be released once the review is over.
+\else
+The code is available at \url{https://github.com/t-raisa/football-market-value}.
+\fi
 
-\IEEEtriggeratref{18}    % balance the two columns on the last page
+% Balance the two columns on the last page (submission version). The camera-ready version is balanced without a break.
+\ifanonymous\IEEEtriggeratref{13}\fi
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 

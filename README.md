@@ -1,4 +1,4 @@
-# Forecasting Football Player Market Values from Public Transfermarkt Data
+# Forecasting Football Player Market Values One Year Ahead: A Leak-Checked Public Benchmark
 
 A time-aware, explainable machine-learning study. For each player at a valuation date *t*, we predict the Transfermarkt market value about **12 months later**, using **only information available at *t***.
 
